@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PlanController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,12 +25,14 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::get('/plans', function () {
-    return Inertia::render('Plans/Plans');
-})->middleware(['auth', 'verified'])->name('plans');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
+    Route::get('/plans', function () {
+        return Inertia::render('Plans/Plans');
+    })->name('plans');
+    Route::post('/create-plan', [PlanController::class, 'createPlan']);
+});
 
 require __DIR__.'/auth.php';

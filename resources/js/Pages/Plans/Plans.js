@@ -2,14 +2,41 @@ import Authenticated from '@/Layouts/Authenticated';
 import React, {useState} from 'react';
 import Button from "@/Components/Button";
 import Modal from "@/Components/Modal";
+import {Inertia} from "@inertiajs/inertia";
+import Notification from "@/Components/Notification";
 
 export default function Plans(props) {
     const [openCreatePlanForm, setOpenCreatePlanForm] = useState(false);
+    const [newPlanName, setNewPlanName] = useState('');
+    const [newPlanDescription, setNewPlanDescription] = useState('');
+    const [showNotification, setShowNotification] = useState(false);
+    const [notificationDetails, setNotificationDetails] = useState({});
+
+    const handleNewPlanNameChange = (e) => {
+        setNewPlanName(e.target.value);
+    }
+
+    const handleNewPlanDescriptionChange = (e) => {
+        setNewPlanDescription(e.target.value);
+    }
+
     const openCreatePlanFormModal = () => {
         setOpenCreatePlanForm(true);
     }
     const handleCreatePlanClick = () => {
+        Inertia.post(
+            '/create-plan',
+            {
+                name: newPlanName,
+                description: newPlanDescription,
+            }
+        );
         setOpenCreatePlanForm(false);
+        setShowNotification(true);
+        setNotificationDetails({
+            severity: 'success',
+            message: 'Plan successfully created!',
+        })
     }
     return (
         <Authenticated
@@ -38,6 +65,8 @@ export default function Plans(props) {
                             id="plan_name"
                             className="w-auto focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300"
                             placeholder="Family Expenses"
+                            value={newPlanName}
+                            onChange={handleNewPlanNameChange}
                         />
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
@@ -55,7 +84,8 @@ export default function Plans(props) {
                           rows={3}
                           className="shadow-sm w-auto focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
                           placeholder="A brief description about your plan"
-                          defaultValue={''}
+                          value={newPlanDescription}
+                          onChange={handleNewPlanDescriptionChange}
                       />
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
@@ -63,6 +93,9 @@ export default function Plans(props) {
                     </p>
                 </div>
             </Modal>
+            {showNotification ? (
+                <Notification message={notificationDetails.message} severity={notificationDetails.severity}/>
+            ) : ''}
         </Authenticated>
     );
 }
