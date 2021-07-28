@@ -6,6 +6,7 @@ import {Inertia} from "@inertiajs/inertia";
 import Notification from "@/Components/Notification";
 import CardWithNavButton from "@/Components/Card";
 import {Box} from "@material-ui/core";
+import PlanContainer from "@/Pages/Plans/PlanContainer";
 
 export default function Plans(props) {
     const [openCreatePlanForm, setOpenCreatePlanForm] = useState(false);
@@ -48,35 +49,29 @@ export default function Plans(props) {
             errors={props.errors}
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Plans</h2>}
         >
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 bg-white border-b border-gray-200">
-                            <Button className={'bg-blue-400'} onClick={openCreatePlanFormModal}>
-                                Create Plan
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                            </Button>
-                            <h3 className="text-2xl mt-7">Plans created by you</h3>
-                            {plans.length > 0 ? (
-                                <Box display="flex" flexWrap="wrap">
-                                    {plans.map((plan) => (
-                                        <CardWithNavButton
-                                            key={plan.id}
-                                            title={plan.name}
-                                            body={plan.description}
-                                            subTitle={plan.created_at.split('T')[0]}
-                                            buttonText="View Plan"
-                                            navLink={`/plan/${plan.id}`}
-                                        />
-                                    ))}
-                                </Box>
-                            ) : 'You have not created any plans.'}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <PlanContainer>
+                <Button className={'bg-blue-400'} onClick={openCreatePlanFormModal}>
+                    Create Plan
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                </Button>
+                <h3 className="text-2xl mt-7">Plans created by you</h3>
+                {plans.length > 0 ? (
+                    <Box display="flex" flexWrap="wrap">
+                        {plans.map((plan) => (
+                            <CardWithNavButton
+                                key={plan.id}
+                                title={plan.name}
+                                body={plan.description}
+                                subTitle={plan.created_at.split('T')[0]}
+                                buttonText="View Plan"
+                                navLink={`/plan/${plan.id}`}
+                            />
+                        ))}
+                    </Box>
+                ) : 'You have not created any plans.'}
+            </PlanContainer>
             <Modal open={openCreatePlanForm} setOpen={setOpenCreatePlanForm} title={'Create Plan'} actionText={'Create'} onClickAction={handleCreatePlanClick}>
                 <div>
                     <label htmlFor="plan_name" className="block text-sm font-medium text-gray-700">
