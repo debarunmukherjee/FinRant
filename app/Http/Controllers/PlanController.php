@@ -6,9 +6,16 @@ use App\Models\Plan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
 
 class PlanController extends Controller
 {
+    public function index()
+    {
+        $plans = Plan::where('created_by', Auth::id())->orderByDesc('created_at')->get();
+        return Inertia::render('Plans/Plans', ['plans' => $plans]);
+    }
+
     public function createPlan(Request $request)
     {
         $request->validate([
