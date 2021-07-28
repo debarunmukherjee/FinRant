@@ -16,6 +16,15 @@ class PlanController extends Controller
         return Inertia::render('Plans/Plans', ['plans' => $plans]);
     }
 
+    public function getPlan($planId)
+    {
+        $plan = Plan::where([['created_by', Auth::id()], ['id', $planId]])->first();
+        if (empty($plan)) {
+            abort(404);
+        }
+        return Inertia::render('Plans/ViewPlan', ['planDetails' => $plan]);
+    }
+
     public function createPlan(Request $request)
     {
         $request->validate([
