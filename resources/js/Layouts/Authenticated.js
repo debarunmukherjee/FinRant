@@ -3,10 +3,15 @@ import Dropdown from '../Components/Dropdown';
 import NavLink from '../Components/NavLink';
 import React, { useState } from 'react';
 import ResponsiveNavLink from '../Components/ResponsiveNavLink';
-import { InertiaLink } from '@inertiajs/inertia-react';
+import {InertiaLink, usePage} from '@inertiajs/inertia-react';
+import Notification from "@/Components/Notification";
 
 export default function Authenticated({ auth, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const { flash } = usePage().props;
+    const message = flash.message;
+    const success = flash.success;
+    const error = flash.error;
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -134,6 +139,9 @@ export default function Authenticated({ auth, header, children }) {
             )}
 
             <main>{children}</main>
+            {message ? (<Notification message={message} severity="info"/>) : ''}
+            {success ? (<Notification message={success} severity="success"/>) : ''}
+            {error ? (<Notification message={error} severity="error"/>) : ''}
         </div>
     );
 }
