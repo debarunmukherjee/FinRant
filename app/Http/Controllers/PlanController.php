@@ -29,7 +29,7 @@ class PlanController extends Controller
     {
         $request->validate([
             'name' => ['required', 'max:50'],
-            'description' => ['required', 'max:50']
+            'description' => ['required', 'max:255']
         ]);
         Plan::create([
             'name' => $request->post('name'),

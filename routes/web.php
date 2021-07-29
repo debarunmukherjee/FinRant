@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PlanController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/plan/{planId}', [PlanController::class, 'getPlan'])->name('plan.view');
     Route::get('/plans', [PlanController::class, 'index'])->name('plans');
     Route::post('/create-plan', [PlanController::class, 'createPlan']);
+    Route::post('/category/add', [CategoryController::class, 'createCategory']);
 });
 
 require __DIR__.'/auth.php';

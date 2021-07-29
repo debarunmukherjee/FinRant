@@ -1,6 +1,10 @@
 import React from "react";
 import Authenticated from "@/Layouts/Authenticated";
 import PlanContainer from "@/Pages/Plans/PlanContainer";
+import SimpleTabs from "@/Components/SimpleTabs";
+import PlanDetails from "@/Pages/Plans/PlanDetails";
+import PlanUsers from "@/Pages/Plans/PlanUsers";
+import PlanActivity from "@/Pages/Plans/PlanActivity";
 
 export default function ViewPlan(props) {
     const {planDetails} = props;
@@ -13,6 +17,24 @@ export default function ViewPlan(props) {
         >
             <PlanContainer>
                 {planDetails.description}
+                <SimpleTabs
+                    tabList={
+                        [
+                            {
+                                label: 'Plan Details',
+                                contents: (<PlanDetails/>),
+                            },
+                            {
+                                label: 'Plan Users',
+                                contents: (<PlanUsers/>),
+                            },
+                            {
+                                label: 'Plan Activity',
+                                contents: (<PlanActivity/>),
+                            }
+                        ]
+                    }
+                />
             </PlanContainer>
         </Authenticated>
     );
