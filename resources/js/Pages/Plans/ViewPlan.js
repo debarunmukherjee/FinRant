@@ -22,7 +22,7 @@ export default function ViewPlan(props) {
                         [
                             {
                                 label: 'Plan Details',
-                                contents: (<PlanDetails/>),
+                                contents: (<PlanDetails id={planDetails.id}/>),
                             },
                             {
                                 label: 'Plan Users',
