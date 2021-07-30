@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PlanController;
 use Illuminate\Foundation\Application;
@@ -34,6 +35,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/plans', [PlanController::class, 'index'])->name('plans');
     Route::post('/create-plan', [PlanController::class, 'createPlan']);
     Route::post('/category/add', [CategoryController::class, 'createCategory']);
+    Route::post('/budget/add', [BudgetController::class, 'addBudget']);
+    Route::put('/budget/edit', [BudgetController::class, 'updateBudget']);
+    Route::post('/budget/delete', [BudgetController::class, 'deleteBudget']);
 });
 
 require __DIR__.'/auth.php';
