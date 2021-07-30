@@ -36,7 +36,7 @@ export default function Notification({message, severity}) {
 
     return (
         <div className={classes.root}>
-            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} style={{zIndex: '500'}}>
                 <Alert onClose={handleClose} severity={severity}>
                     {message}
                 </Alert>
