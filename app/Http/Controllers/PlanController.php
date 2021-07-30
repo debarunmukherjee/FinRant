@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ExpendCategory;
 use App\Models\Plan;
+use App\Models\PlanCategoryBudget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -22,7 +24,9 @@ class PlanController extends Controller
         if (empty($plan)) {
             abort(404);
         }
-        return Inertia::render('Plans/ViewPlan', ['planDetails' => $plan]);
+        $budgetList = PlanCategoryBudget::getBudgetListForCurrentPlan($planId);
+        $categoryList = ExpendCategory::getAllCategoriesForCurrentUser();
+        return Inertia::render('Plans/ViewPlan', ['planDetails' => $plan, 'budgetList' => $budgetList, 'categoryList' => $categoryList]);
     }
 
     public function createPlan(Request $request)
