@@ -3,6 +3,7 @@
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\UserProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -38,6 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/budget/add', [BudgetController::class, 'addBudget']);
     Route::put('/budget/edit', [BudgetController::class, 'updateBudget']);
     Route::post('/budget/delete', [BudgetController::class, 'deleteBudget']);
+    Route::get('/user/profile', [UserProfileController::class, 'viewProfile'])->name('user.profile');
 });
 
 require __DIR__.'/auth.php';
