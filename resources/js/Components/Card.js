@@ -11,7 +11,7 @@ const useStyles = makeStyles({
     root: {
         minWidth: 270,
         margin: 10,
-        backgroundColor: "rgba(219, 234, 254, 1)",
+        border: "5px solid rgba(219, 234, 254, 1)",
     },
     bullet: {
         display: 'inline-block',
@@ -19,11 +19,17 @@ const useStyles = makeStyles({
         transform: 'scale(0.8)',
     },
     title: {
-        fontSize: 14,
+        fontSize: '1.125rem',
     },
     pos: {
+        marginTop: '5px',
+        fontSize: '0.75rem',
+        lineHeight: '1rem',
         marginBottom: 12,
     },
+    body: {
+        marginTop: '2rem'
+    }
 });
 
 export default function CardWithNavButton({title, subTitle, buttonText, body, navLink}) {
@@ -32,13 +38,14 @@ export default function CardWithNavButton({title, subTitle, buttonText, body, na
     return (
         <Card className={classes.root}>
             <CardContent>
-                <Typography variant="h5" component="h2">
+                <Typography className={classes.title} variant="h5" component="h2">
                     {title}
                 </Typography>
                 <Typography className={classes.pos} color="textSecondary">
                     {subTitle}
                 </Typography>
-                <Typography variant="body2" component="p">
+                <hr/>
+                <Typography className={classes.body} variant="body2" component="p">
                     {body}
                 </Typography>
             </CardContent>
