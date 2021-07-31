@@ -15,8 +15,9 @@ class CreateExpendCategoriesTable extends Migration
     {
         Schema::create('expend_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('name');
             $table->foreignId('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->unique(['name', 'created_by']);
             $table->timestamps();
         });
     }
