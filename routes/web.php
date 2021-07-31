@@ -40,6 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/budget/edit', [BudgetController::class, 'updateBudget']);
     Route::post('/budget/delete', [BudgetController::class, 'deleteBudget']);
     Route::get('/user/profile', [UserProfileController::class, 'viewProfile'])->name('user.profile');
+    Route::post('/user/update', [UserProfileController::class, 'updateProfile']);
 });
 
 require __DIR__.'/auth.php';

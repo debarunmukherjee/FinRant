@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\UserInformation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use PragmaRX\Countries\Package\Countries;
@@ -19,7 +23,7 @@ class UserProfileController extends Controller
         $email = Auth::user()->email;
         $userInformation = UserInformation::all()->where('user_id', $userId)->first();
         $country = $userInformation->country;
-        $avatar = $userInformation->profile_picture;
+        $avatar = asset('storage/images/' . $userInformation->profile_picture);
 
         return Inertia::render('UserProfile', [
             'userDetails' => [
@@ -29,7 +33,42 @@ class UserProfileController extends Controller
                 'country' => $country,
                 'avatar' => $avatar
             ],
-            'countryList' => Countries::all()->pluck('name.common')
+            'countryList' => Countries::all()->pluck('name.common')->toArray()
         ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'firstName' => ['required', 'string', 'max:255'],
+            'lastName' => ['string', 'max:255'],
+            'country' => ['required', Rule::in(Countries::all()->pluck('name.common')->toArray())],
+            'email' => ['email', 'required', Rule::unique('users')->ignore(Auth::id())],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+        ]);
+
+        $user = User::where('id', Auth::id())->first();
+        $user->first_name = $request->post('firstName');
+        $user->last_name = $request->post('lastName');
+        $user->email = $request->post('email');
+        $result = $user->save();
+
+        if ($request->hasFile('avatar')) {
+            $image = $request->file('avatar');
+            $fileName = bin2hex(random_bytes(16)) . '.' . $image->getClientOriginalExtension();
+            Storage::disk('public')->put("images/$fileName", file_get_contents($image->getRealPath()));
+        }
+
+        $userInformation = UserInformation::where('user_id', Auth::id())->first();
+        $userInformation->country = $request->post('country');
+        if (!empty($fileName)) {
+            $userInformation->profile_picture = $fileName;
+        }
+        $result = $result && $userInformation->save();
+
+        if (!$result) {
+            return Redirect::back()->with('error', 'Could not save user information.');
+        }
+        return Redirect::back()->with('success', 'Your information is successfully updated!');
     }
 }
