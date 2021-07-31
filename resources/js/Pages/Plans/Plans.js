@@ -64,7 +64,7 @@ export default function Plans(props) {
                                 key={plan.id}
                                 title={plan.name}
                                 body={plan.description}
-                                subTitle={plan.created_at.split('T')[0]}
+                                subTitle={'Created On: ' + plan.created_at.split('T')[0]}
                                 buttonText="View Plan"
                                 navLink={`/plan/${plan.id}`}
                             />
