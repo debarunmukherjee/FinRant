@@ -40,6 +40,6 @@ class PlanController extends Controller
             'description' => $request->post('description'),
             'created_by' => Auth::id(),
         ]);
-        return Redirect::route('plans');
+        return Redirect::back()->with('success', 'Plan successfully created!');
     }
 }
