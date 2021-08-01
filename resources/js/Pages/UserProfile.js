@@ -103,6 +103,7 @@ export default function Dashboard(props) {
                                                 setImage={setUserImageFile}
                                                 altText={userDetails.firstName}
                                             />
+                                            {errors.avatar ? <p className="text-xs text-red-500 text-center mt-3">{errors.avatar}</p> : ''}
                                         </div>
                                     </Grid>
                                 </Grid>
