@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\InviteUserController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\UserProfileController;
 use Illuminate\Foundation\Application;
@@ -41,6 +42,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/budget/delete', [BudgetController::class, 'deleteBudget']);
     Route::get('/user/profile', [UserProfileController::class, 'viewProfile'])->name('user.profile');
     Route::post('/user/update', [UserProfileController::class, 'updateProfile']);
+    Route::post('/invite/user', [InviteUserController::class, 'createInvite']);
+    Route::get('/view/invites', [InviteUserController::class, 'viewInvites'])->name('invites.view');
 });
 
 require __DIR__.'/auth.php';
