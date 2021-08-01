@@ -35,7 +35,12 @@ class PlanUserInvite extends Model
         ])->first();
 
         $invite->has_accepted = 1;
-        return $invite->save();
+        $result = $invite->save();
+
+        $planMember = new PlanMember;
+        $planMember->plan_id = $planId;
+        $planMember->user_id = $userId;
+        return $result && $planMember->save();
     }
 
     public static function rejectUserInvite($inviterUserId, $userId, $planId): bool
