@@ -4,7 +4,7 @@ import Button from "@/Components/Button";
 import Modal from "@/Components/Modal";
 import {Inertia} from "@inertiajs/inertia";
 import CardWithNavButton from "@/Components/Card";
-import {Box} from "@material-ui/core";
+import {Box, Divider} from "@material-ui/core";
 import PlanContainer from "@/Pages/Plans/PlanContainer";
 
 export default function Plans(props) {
@@ -12,7 +12,7 @@ export default function Plans(props) {
     const [newPlanName, setNewPlanName] = useState('');
     const [newPlanDescription, setNewPlanDescription] = useState('');
 
-    const {createdPlans} = props;
+    const { createdPlans, memberPlans } = props;
 
     const handleNewPlanNameChange = (e) => {
         setNewPlanName(e.target.value);
@@ -49,6 +49,7 @@ export default function Plans(props) {
                     </svg>
                 </Button>
                 <h3 className="text-2xl mt-7">Plans created by you</h3>
+                <Divider className="w-2/3" style={{marginTop: '0.75rem', marginBottom: '0.5rem'}} />
                 {createdPlans.length > 0 ? (
                     <Box display="flex" flexWrap="wrap">
                         {createdPlans.map((plan) => (
@@ -63,6 +64,22 @@ export default function Plans(props) {
                         ))}
                     </Box>
                 ) : 'You have not created any createdPlans.'}
+                <h3 className="text-2xl mt-20">Plans you're a member of</h3>
+                <Divider className="w-2/3" style={{marginTop: '0.75rem', marginBottom: '0.5rem'}} />
+                {memberPlans.length > 0 ? (
+                    <Box display="flex" flexWrap="wrap">
+                        {memberPlans.map((plan) => (
+                            <CardWithNavButton
+                                key={plan.id}
+                                title={plan.name}
+                                body={plan.description}
+                                subTitle={'Created On: ' + plan.created_at.split('T')[0]}
+                                buttonText="View Plan"
+                                navLink={`/plan/${plan.id}`}
+                            />
+                        ))}
+                    </Box>
+                ) : 'You are not a member of any plan.'}
             </PlanContainer>
             <Modal open={openCreatePlanForm} setOpen={setOpenCreatePlanForm} title={'Create Plan'} actionText={'Create'} onClickAction={handleCreatePlanClick}>
                 <div>
