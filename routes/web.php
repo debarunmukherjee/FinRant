@@ -44,6 +44,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/user/update', [UserProfileController::class, 'updateProfile']);
     Route::post('/invite/user', [InviteUserController::class, 'createInvite']);
     Route::get('/view/invites', [InviteUserController::class, 'viewInvites'])->name('invites.view');
+    Route::put('/invite/accept', [InviteUserController::class, 'acceptInvite']);
+    Route::put('/invite/reject', [InviteUserController::class, 'rejectInvite']);
 });
 
 require __DIR__.'/auth.php';
