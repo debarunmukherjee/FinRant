@@ -17,6 +17,7 @@ class CreatePlanMembersTable extends Migration
             $table->id();
             $table->foreignId('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unique(['plan_id', 'user_id']);
             $table->timestamps();
         });
     }
