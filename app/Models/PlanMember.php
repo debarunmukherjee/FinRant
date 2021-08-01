@@ -27,4 +27,12 @@ class PlanMember extends Model
             ->get(['plans.*', DB::raw("'member' as role")])
             ->toArray();
     }
+
+    public static function isUserPlanMember($userId, $planId)
+    {
+        return self::where([
+            ['plan_id', $planId],
+            ['user_id', $userId]
+        ])->exists();
+    }
 }
