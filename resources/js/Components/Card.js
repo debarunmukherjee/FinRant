@@ -32,14 +32,21 @@ const useStyles = makeStyles({
     }
 });
 
-export default function CardWithNavButton({title, subTitle, buttonText, body, navLink}) {
+export default function CardWithNavButton({title, subTitle, buttonText, body, navLink, titleBadgeText, titleBadgeColor}) {
     const classes = useStyles();
 
     return (
         <Card className={classes.root}>
             <CardContent>
                 <Typography className={classes.title} variant="h5" component="h2">
-                    {title}
+                    <div className="flex">
+                        <p>{title}</p>
+                        <p className="ml-auto">
+                            <span className={`inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-${titleBadgeColor}-100 bg-${titleBadgeColor}-600 rounded-full`}>
+                                {titleBadgeText}
+                            </span>
+                        </p>
+                    </div>
                 </Typography>
                 <Typography className={classes.pos} color="textSecondary">
                     {subTitle}
