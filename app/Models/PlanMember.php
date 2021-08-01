@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class PlanMember extends Model
 {
@@ -21,10 +22,9 @@ class PlanMember extends Model
      */
     public static function getMemberPlansDetails($userId)
     {
-        return Plan::select('plans.*')
-            ->join('plan_members', 'plan_members.plan_id', '=', 'plans.id')
+        return Plan::join('plan_members', 'plan_members.plan_id', '=', 'plans.id')
             ->where('plan_members.user_id', $userId)
-            ->get()
+            ->get(['plans.*', DB::raw("'member' as role")])
             ->toArray();
     }
 }

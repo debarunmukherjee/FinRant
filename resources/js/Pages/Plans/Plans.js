@@ -60,6 +60,8 @@ export default function Plans(props) {
                                 subTitle={'Created On: ' + plan.created_at.split('T')[0]}
                                 buttonText="View Plan"
                                 navLink={`/plan/${plan.id}`}
+                                titleBadgeColor='green'
+                                titleBadgeText={plan.role}
                             />
                         ))}
                     </Box>
@@ -76,6 +78,8 @@ export default function Plans(props) {
                                 subTitle={'Created On: ' + plan.created_at.split('T')[0]}
                                 buttonText="View Plan"
                                 navLink={`/plan/${plan.id}`}
+                                titleBadgeColor='purple'
+                                titleBadgeText={plan.role}
                             />
                         ))}
                     </Box>

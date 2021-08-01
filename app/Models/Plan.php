@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Plan extends Model
 {
@@ -32,6 +33,6 @@ class Plan extends Model
      */
     public static function getCreatedPlansDetails($userId)
     {
-        return self::where('created_by', $userId)->orderByDesc('created_at')->get()->toArray();
+        return self::where('created_by', $userId)->orderByDesc('created_at')->get(['plans.*', DB::raw("'creator' as role")])->toArray();
     }
 }
