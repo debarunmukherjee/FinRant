@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\PlanUserInvite;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -33,9 +35,11 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request)
     {
+        $userData = $request->user();
+        $userData['pendingInvites'] = PlanUserInvite::getInviteCountOfUser(Auth::id());
         return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user(),
+                'user' => $userData,
             ],
             'flash' => [
                 'message' => function () use ($request) {
