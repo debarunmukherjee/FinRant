@@ -26,11 +26,11 @@ export default function ViewPlan(props) {
                             },
                             {
                                 label: 'Plan Users',
-                                contents: (<PlanUsers/>),
+                                contents: (<PlanUsers id={planDetails.id}/>),
                             },
                             {
                                 label: 'Plan Activity',
-                                contents: (<PlanActivity/>),
+                                contents: (<PlanActivity id={planDetails.id}/>),
                             }
                         ]
                     }
