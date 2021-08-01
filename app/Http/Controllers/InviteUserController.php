@@ -19,7 +19,15 @@ class InviteUserController extends Controller
         $userId = Auth::id();
         $planId = $request->post('planId');
         $request->validate([
-            'planId' => ['required', 'exists:plans,id'],
+            'planId' => [
+                'required',
+                'exists:plans,id',
+                function ($attribute, $value, $fail) use($userId) {
+                    if ((int)$userId !== Plan::getPlanCreatorUserId($value)) {
+                        $fail("You do not have access to add user to this plan.");
+                    }
+                }
+            ],
             'inviteEmail' => [
                 'required',
                 'email',
