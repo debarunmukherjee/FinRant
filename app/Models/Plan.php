@@ -21,6 +21,11 @@ class Plan extends Model
         return self::select('id')->where('name', $name)->first()->id;
     }
 
+    public static function getPlanDetails($planId)
+    {
+        return self::where('id', $planId)->first();
+    }
+
     public static function getPlanCreatorUserId($planId)
     {
         return self::select('created_by')->where('id', $planId)->first()->created_by;
