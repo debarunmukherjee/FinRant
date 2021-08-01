@@ -25,4 +25,28 @@ class PlanUserInvite extends Model
             ['is_rejected', 0]
         ])->count();
     }
+
+    public static function acceptUserInvite($inviterUserId, $userId, $planId): bool
+    {
+        $invite = self::where([
+            ['sent_by', $inviterUserId],
+            ['sent_to', $userId],
+            ['plan_id', $planId]
+        ])->first();
+
+        $invite->has_accepted = 1;
+        return $invite->save();
+    }
+
+    public static function rejectUserInvite($inviterUserId, $userId, $planId): bool
+    {
+        $invite = self::where([
+            ['sent_by', $inviterUserId],
+            ['sent_to', $userId],
+            ['plan_id', $planId]
+        ])->first();
+
+        $invite->is_rejected = 1;
+        return $invite->save();
+    }
 }
