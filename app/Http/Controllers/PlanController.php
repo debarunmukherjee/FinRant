@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ExpendCategory;
 use App\Models\Plan;
 use App\Models\PlanCategoryBudget;
+use App\Models\PlanMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -14,8 +15,9 @@ class PlanController extends Controller
 {
     public function index()
     {
-        $plans = Plan::where('created_by', Auth::id())->orderByDesc('created_at')->get();
-        return Inertia::render('Plans/Plans', ['plans' => $plans]);
+        $plans = Plan::getCreatedPlansDetails(Auth::id());
+        $memberPlans = PlanMember::getMemberPlansDetails(Auth::id());
+        return Inertia::render('Plans/Plans', ['createdPlans' => $plans, 'memberPlans' => $memberPlans]);
     }
 
     public function getPlan($planId)

@@ -12,7 +12,7 @@ export default function Plans(props) {
     const [newPlanName, setNewPlanName] = useState('');
     const [newPlanDescription, setNewPlanDescription] = useState('');
 
-    const {plans} = props;
+    const {createdPlans} = props;
 
     const handleNewPlanNameChange = (e) => {
         setNewPlanName(e.target.value);
@@ -49,9 +49,9 @@ export default function Plans(props) {
                     </svg>
                 </Button>
                 <h3 className="text-2xl mt-7">Plans created by you</h3>
-                {plans.length > 0 ? (
+                {createdPlans.length > 0 ? (
                     <Box display="flex" flexWrap="wrap">
-                        {plans.map((plan) => (
+                        {createdPlans.map((plan) => (
                             <CardWithNavButton
                                 key={plan.id}
                                 title={plan.name}
@@ -62,7 +62,7 @@ export default function Plans(props) {
                             />
                         ))}
                     </Box>
-                ) : 'You have not created any plans.'}
+                ) : 'You have not created any createdPlans.'}
             </PlanContainer>
             <Modal open={openCreatePlanForm} setOpen={setOpenCreatePlanForm} title={'Create Plan'} actionText={'Create'} onClickAction={handleCreatePlanClick}>
                 <div>
