@@ -14,4 +14,9 @@ class Plan extends Model
         'description',
         'created_by'
     ];
+
+    public static function getPlanIdFromName($name)
+    {
+        return self::select('id')->where('name', $name)->first()->id;
+    }
 }
