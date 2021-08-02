@@ -44,6 +44,7 @@ class User extends Authenticatable
 
     public static function getUserIdFromEmail($email)
     {
-        return self::select('id')->where('email', $email)->first()->id;
+        $result = self::select('id')->where('email', $email)->first();
+        return empty($result) ? 0 : $result->id;
     }
 }
