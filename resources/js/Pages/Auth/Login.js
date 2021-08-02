@@ -74,6 +74,12 @@ export default function Login({ status, canResetPassword }) {
                 </div>
 
                 <div className="flex items-center justify-end mt-4">
+                    <InertiaLink
+                        href={route('register')}
+                        className="underline text-sm text-gray-600 hover:text-gray-900 mr-3"
+                    >
+                        Register
+                    </InertiaLink>
                     {canResetPassword && (
                         <InertiaLink
                             href={route('password.request')}
