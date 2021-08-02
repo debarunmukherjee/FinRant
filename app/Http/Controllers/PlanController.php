@@ -24,7 +24,7 @@ class PlanController extends Controller
     {
         $planCreatorId = Plan::getPlanCreatorUserId($planId);
         $isUserPlanMember = PlanMember::isUserPlanMember($planId, Auth::id());
-        if (empty($planCreatorId) || !($planCreatorId !== (int)Auth::id() && !$isUserPlanMember)) {
+        if (empty($planCreatorId) || ($planCreatorId !== (int)Auth::id() && !$isUserPlanMember)) {
             abort(404);
         }
         $plan = Plan::getPlanDetails($planId);
