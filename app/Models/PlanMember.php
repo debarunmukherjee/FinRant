@@ -28,7 +28,7 @@ class PlanMember extends Model
             ->toArray();
     }
 
-    public static function isUserPlanMember($userId, $planId)
+    public static function isUserPlanMember($planId, $userId)
     {
         return self::where([
             ['plan_id', $planId],
