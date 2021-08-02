@@ -16,7 +16,9 @@ export default function ViewPlan(props) {
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Plan: {planDetails.name}</h2>}
         >
             <PlanContainer>
-                {planDetails.description}
+                <div className="m-4 p-6 rounded bg-gray-100">
+                    <span className="font-bold">About: </span> <span className="font-light">{planDetails.description}</span>
+                </div>
                 <SimpleTabs
                     tabList={
                         [
