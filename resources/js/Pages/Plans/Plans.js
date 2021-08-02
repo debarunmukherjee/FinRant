@@ -65,7 +65,7 @@ export default function Plans(props) {
                             />
                         ))}
                     </Box>
-                ) : 'You have not created any createdPlans.'}
+                ) : 'You have not created any plans.'}
                 <h3 className="text-2xl mt-20">Plans you're a member of</h3>
                 <Divider className="w-2/3" style={{marginTop: '0.75rem', marginBottom: '0.5rem'}} />
                 {memberPlans.length > 0 ? (
