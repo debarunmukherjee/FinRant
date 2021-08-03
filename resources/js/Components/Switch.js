@@ -1,4 +1,5 @@
 import { Switch } from '@headlessui/react'
+import React from "react";
 
 export default function CustomSwitch({ isEnabled, setIsEnabled, labelText, shouldDisplayYesNo }) {
 
@@ -6,7 +7,9 @@ export default function CustomSwitch({ isEnabled, setIsEnabled, labelText, shoul
         <div className="flex">
             <Switch.Group>
                 <Switch.Label className="mr-4 pt-1.5">
-                    {labelText} {shouldDisplayYesNo && (isEnabled ? <span className="font-bold">Yes</span> :  <span className="font-bold">No</span>)}
+                    <label className="block text-sm font-medium text-gray-700">
+                        {labelText} {shouldDisplayYesNo && (isEnabled ? <span className="font-bold">Yes</span> :  <span className="font-bold">No</span>)}
+                    </label>
                 </Switch.Label>
                 <Switch
                     checked={isEnabled}
