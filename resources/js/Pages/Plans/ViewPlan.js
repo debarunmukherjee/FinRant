@@ -5,6 +5,7 @@ import SimpleTabs from "@/Components/SimpleTabs";
 import PlanDetails from "@/Pages/Plans/PlanDetails";
 import PlanUsers from "@/Pages/Plans/PlanUsers";
 import PlanActivity from "@/Pages/Plans/PlanActivity";
+import PlanExpenses from "@/Pages/Plans/PlanExpenses";
 
 export default function ViewPlan(props) {
     const {planDetails} = props;
@@ -33,6 +34,10 @@ export default function ViewPlan(props) {
                             {
                                 label: 'Plan Activity',
                                 contents: (<PlanActivity id={planDetails.id}/>),
+                            },
+                            {
+                                label: 'Plan Expense',
+                                contents: (<PlanExpenses planId={planDetails.id}/>),
                             }
                         ]
                     }
