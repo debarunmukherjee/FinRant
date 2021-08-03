@@ -14,8 +14,10 @@ export default function AutocompleteSelect({ itemsList, selectedValue, itemLabel
             getOptionLabel={(option) => (itemLabelKey ? option[itemLabelKey] : option)}
             value={value}
             onChange={(event, newInputValue) => {
-                setSelectedValue(itemLabelKey ? newInputValue[itemLabelKey] : newInputValue);
-                setValue(newInputValue);
+                if (newInputValue) {
+                    setSelectedValue(itemLabelKey ? newInputValue[itemLabelKey] : newInputValue);
+                    setValue(newInputValue);
+                }
             }}
             inputValue={inputValue}
             onInputChange={(event, newInputValue) => {
