@@ -16,7 +16,7 @@ class Plan extends Model
         'created_by'
     ];
 
-    public static function getPlanIdFromName($name)
+    public static function getPlanIdFromName($name): int
     {
         $result = self::select('id')->where('name', $name)->first();
         return empty($result) ? 0 : (int)$result->id;
@@ -27,10 +27,15 @@ class Plan extends Model
         return self::where('id', $planId)->first();
     }
 
-    public static function getPlanCreatorUserId($planId)
+    public static function getPlanCreatorUserId($planId): int
     {
         $result = self::select('created_by')->where('id', $planId)->first();
         return empty($result) ? 0 : (int)$result->created_by;
+    }
+
+    public static function isUserPlanCreator($planId, $userId): bool
+    {
+        return (int)$userId === self::getPlanCreatorUserId($planId);
     }
 
     /**
