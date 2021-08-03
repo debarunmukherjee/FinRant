@@ -1,11 +1,15 @@
 import {Autocomplete} from "@material-ui/lab";
 import React, {useState} from "react";
+import {Popper} from "@material-ui/core";
 
 export default function AutocompleteSelect({ itemsList, selectedValue, itemLabelKey, setSelectedValue }) {
     const [value, setValue] = useState(selectedValue);
     const [inputValue, setInputValue] = useState('');
     return (
         <Autocomplete
+            PopperComponent={(props) => {
+                return (<Popper {...props} disablePortal={true} placement='bottom-start'/>);
+            }}
             options={itemsList}
             getOptionLabel={(option) => (itemLabelKey ? option[itemLabelKey] : option)}
             value={value}
