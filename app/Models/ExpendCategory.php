@@ -17,6 +17,12 @@ class ExpendCategory extends Model
 
     public static function getAllCategoriesForCurrentUser()
     {
-        return self::select('name')->where('created_by', Auth::id())->get();
+        return self::select('name')->where('created_by', Auth::id())->get()->toArray();
+    }
+
+    public static function getCategoryIdFromName($name)
+    {
+        $result = self::where('name', $name)->first();
+        return empty($result) ? 0 : $result->id;
     }
 }
