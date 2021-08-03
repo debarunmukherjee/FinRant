@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ExpenseControler;
 use App\Http\Controllers\InviteUserController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\UserProfileController;
@@ -46,6 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/view/invites', [InviteUserController::class, 'viewInvites'])->name('invites.view');
     Route::put('/invite/accept', [InviteUserController::class, 'acceptInvite']);
     Route::put('/invite/reject', [InviteUserController::class, 'rejectInvite']);
+    Route::post('/expense/add', [ExpenseControler::class, 'createExpense']);
 });
 
 require __DIR__.'/auth.php';
