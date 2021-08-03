@@ -2,7 +2,7 @@ import {Autocomplete} from "@material-ui/lab";
 import React, {useState} from "react";
 import {Popper} from "@material-ui/core";
 
-export default function AutocompleteSelect({ itemsList, selectedValue, itemLabelKey, setSelectedValue }) {
+export default function AutocompleteSelect({ itemsList, selectedValue, itemLabelKey, setSelectedValue, placeholder }) {
     const [value, setValue] = useState(selectedValue);
     const [inputValue, setInputValue] = useState('');
     return (
@@ -23,7 +23,7 @@ export default function AutocompleteSelect({ itemsList, selectedValue, itemLabel
             }}
             renderInput={(params) => (
                 <div ref={params.InputProps.ref} className="flex flex-col relative text-gray-600">
-                    <input type="search" placeholder="Search Country" {...params.inputProps} className="bg-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none"/>
+                    <input type="search" placeholder={placeholder} {...params.inputProps} className="bg-white h-10 px-5 pr-10 rounded-full text-sm focus:outline-none"/>
                     <button type="submit"
                             className="absolute right-0 top-0 mt-2 mr-4">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

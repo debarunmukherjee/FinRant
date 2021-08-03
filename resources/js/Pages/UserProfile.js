@@ -85,6 +85,7 @@ export default function Dashboard(props) {
                                                 itemsList={countryList}
                                                 selectedValue={userDetails.country}
                                                 setSelectedValue={setUserCountry}
+                                                placeholder="Search Country"
                                             />
                                             {errors.country ? <p className="text-xs text-red-500">{errors.country}</p> : ''}
                                         </div>
