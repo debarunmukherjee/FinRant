@@ -43,10 +43,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public static function getUserIdFromEmail($email)
+    public static function getUserIdFromEmail($email): int
     {
         $result = self::select('id')->where('email', $email)->first();
-        return empty($result) ? 0 : $result->id;
+        return empty($result) ? 0 : (int)$result->id;
     }
 
     /**
