@@ -6,6 +6,7 @@ import PlanDetails from "@/Pages/Plans/PlanDetails";
 import PlanUsers from "@/Pages/Plans/PlanUsers";
 import PlanActivity from "@/Pages/Plans/PlanActivity";
 import RecordPlanExpense from "@/Pages/Plans/RecordPlanExpense";
+import PlanExpenses from "@/Pages/Plans/PlanExpenses";
 
 export default function ViewPlan(props) {
     const {planDetails} = props;
@@ -38,6 +39,10 @@ export default function ViewPlan(props) {
                             {
                                 label: 'Record Expense',
                                 contents: (<RecordPlanExpense planId={planDetails.id}/>),
+                            },
+                            {
+                                label: 'Plan Expenses',
+                                contents: (<PlanExpenses planId={planDetails.id}/>),
                             }
                         ]
                     }
