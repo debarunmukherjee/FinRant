@@ -103,34 +103,36 @@ export default function PlanExpenses({ planId }) {
                                 <input type="checkbox" className="form-checkbox h-5 w-5 text-blue-600 rounded" checked={sharedExpenseMembersPaidEqually} onChange={() => {setSharedExpenseMembersPaidEqually(!sharedExpenseMembersPaidEqually)}}/>
                             </label>
                         </div>
-                        <div className="mt-6">
-                            <label htmlFor="expense_amt" className="block text-sm font-medium text-gray-700">
-                                Add member
-                            </label>
-                            <div className="flex flex-col sm:flex-row">
-                                <AutocompleteSelect
-                                    itemsList={planMemberList}
-                                    itemLabelKey="fullName"
-                                    selectedValue={sharedExpenseMemberToBeAdded}
-                                    setSelectedValue={setSharedExpenseMemberToBeAdded}
-                                    placeholder="Search Member"
-                                    customClasses="m-2 ml-2 sm:ml-0 w-full sm:w-1/2"
-                                />
-                                <NumberInput
-                                    value={sharedExpenseMemberAmount}
-                                    setValue={setSharedExpenseMemberAmount}
-                                    placeholder="Enter amount"
-                                    customClasses="m-2"
-                                />
-                                <Button className="hover:bg-blue-500 bg-blue-400 inline justify-center w-full sm:w-auto m-2" onClick={addSharedPaymentMember} processing={sharedExpenseMembersPaidEqually}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </Button>
+                        {!sharedExpenseMembersPaidEqually ? (
+                            <div className="mt-6">
+                                <label htmlFor="expense_amt" className="block text-sm font-medium text-gray-700">
+                                    Add member(s) who paid
+                                </label>
+                                <div className="flex flex-col sm:flex-row">
+                                    <AutocompleteSelect
+                                        itemsList={planMemberList}
+                                        itemLabelKey="fullName"
+                                        selectedValue={sharedExpenseMemberToBeAdded}
+                                        setSelectedValue={setSharedExpenseMemberToBeAdded}
+                                        placeholder="Search Member"
+                                        customClasses="m-2 ml-2 sm:ml-0 w-full sm:w-1/2"
+                                    />
+                                    <NumberInput
+                                        value={sharedExpenseMemberAmount}
+                                        setValue={setSharedExpenseMemberAmount}
+                                        placeholder="Enter amount"
+                                        customClasses="m-2"
+                                    />
+                                    <Button className="hover:bg-blue-500 bg-blue-400 inline justify-center w-full sm:w-auto m-2" onClick={addSharedPaymentMember} processing={sharedExpenseMembersPaidEqually}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </Button>
+                                </div>
+                                {sharedMemberExpenseError ? (<p className="text-red-500 text-xs mb-1">{sharedMemberExpenseError}</p>) : ''}
                             </div>
-                            {sharedMemberExpenseError ? (<p className="text-red-500 text-xs mb-1">{sharedMemberExpenseError}</p>) : ''}
-                        </div>
-                        {sharedExpenseMembersWhoPaid.length > 0 ? (
+                        ) : ''}
+                        {sharedExpenseMembersWhoPaid.length > 0 && !sharedExpenseMembersPaidEqually ? (
                             <div className="flex flex-col">
                                 <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                                     <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
