@@ -25,6 +25,21 @@ export default function PlanExpenses({ planId }) {
         setSharedExpenseMemberToBeAdded(planMemberList[0]);
     },[]);
 
+    useEffect(() => {
+        if (!errors.isSharedExpense && !errors.category && !errors.amount && !errors.planId && !errors.sharedExpenseMembersPaidEqually && !errors.sharedExpenseMembersWhoPaid) {
+            setIsSharedExpense(false);
+            if (categoryList.length > 0) {
+                setSelectedExpenseCategory(categoryList[0]);
+            }
+            setSharedExpenseMemberToBeAdded(planMemberList[0]);
+            setExpenseAmount(0);
+            setSharedExpenseMembersWhoPaid([]);
+            setSharedExpenseMemberAmount(0);
+            setSharedExpenseMembersPaidEqually(true);
+            setSharedMemberExpenseError('');
+        }
+    },[errors]);
+
     const handleRecordExpense = () => {
         Inertia.post('/expense/add', {
             isSharedExpense: isSharedExpense,
