@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class PlanUserInvite extends Model
 {
@@ -28,19 +29,24 @@ class PlanUserInvite extends Model
 
     public static function acceptUserInvite($inviterUserId, $userId, $planId): bool
     {
-        $invite = self::where([
-            ['sent_by', $inviterUserId],
-            ['sent_to', $userId],
-            ['plan_id', $planId]
-        ])->first();
+        return DB::transaction(function () use ($inviterUserId, $userId, $planId) {
+            $invite = self::where([
+                ['sent_by', $inviterUserId],
+                ['sent_to', $userId],
+                ['plan_id', $planId]
+            ])->first();
 
-        $invite->has_accepted = 1;
-        $result = $invite->save();
+            $invite->has_accepted = 1;
+            $result = $invite->save();
 
-        $planMember = new PlanMember;
-        $planMember->plan_id = $planId;
-        $planMember->user_id = $userId;
-        return $result && $planMember->save();
+            $result = $result && PlanDebt::createEntryPlanDebtForNewUser($planId, $userId);
+
+            $planMember = new PlanMember;
+            $planMember->plan_id = $planId;
+            $planMember->user_id = $userId;
+
+            return $result && $planMember->save();
+        });
     }
 
     public static function rejectUserInvite($inviterUserId, $userId, $planId): bool
