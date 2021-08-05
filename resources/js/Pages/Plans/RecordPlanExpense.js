@@ -7,7 +7,7 @@ import {Alert} from "@material-ui/lab";
 import NumberInput from "@/Components/NumberInput";
 import {Inertia} from "@inertiajs/inertia";
 
-export default function PlanExpenses({ planId }) {
+export default function RecordPlanExpense({ planId }) {
     const { categoryList, errors, planMemberList } = usePage().props;
     const [isSharedExpense, setIsSharedExpense] = useState(false);
     const [selectedExpenseCategory, setSelectedExpenseCategory] = useState();
