@@ -26,19 +26,21 @@ export default function PlanExpenses({ planId }) {
     },[]);
 
     const handleRecordExpense = () => {
-        if (!isSharedExpense) {
-            Inertia.post('/expense/add', {
-                isSharedExpense: isSharedExpense,
-                category: selectedExpenseCategory.name,
-                amount: expenseAmount,
-                planId: planId
-            });
-        }
+        Inertia.post('/expense/add', {
+            isSharedExpense: isSharedExpense,
+            category: selectedExpenseCategory.name,
+            amount: expenseAmount,
+            planId: planId,
+            sharedExpenseMembersPaidEqually: sharedExpenseMembersPaidEqually,
+            sharedExpenseMembersWhoPaid: sharedExpenseMembersWhoPaid
+        });
     }
 
     const addSharedPaymentMember = () => {
         if (sharedExpenseMembersWhoPaid.filter((member) => member.email === sharedExpenseMemberToBeAdded.email).length > 0) {
             setSharedMemberExpenseError('Member has already been added.');
+        } else if(sharedExpenseMemberAmount <= 0) {
+            setSharedMemberExpenseError('The amount has to be greater than 0.');
         } else {
             let totalAmount = 0;
             sharedExpenseMembersWhoPaid.forEach((member) => {
