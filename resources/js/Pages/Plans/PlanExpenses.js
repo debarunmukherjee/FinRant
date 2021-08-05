@@ -204,10 +204,15 @@ export default function PlanExpenses({ planId }) {
             <div className="mt-4">
                 <CustomSwitch
                     isEnabled={isSharedExpense}
-                    setIsEnabled={setIsSharedExpense}
+                    setIsEnabled={(value) => {
+                        if (planMemberList.length > 2) {
+                            setIsSharedExpense(value);
+                        }
+                    }}
                     labelText="Share equally among all members? "
                     shouldDisplayYesNo={true}
                 />
+                <p className="text-xs mb-1">Requires at least 2 members in your plan.</p>
             </div>
             <div className="mt-2">
                 {getSingleCategoryExpenseForm()}
