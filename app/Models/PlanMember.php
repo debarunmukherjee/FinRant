@@ -37,17 +37,25 @@ class PlanMember extends Model
     }
 
     /**
-     * Returns a list of details (full name, email and avatar) of members of a plan with id `$planId`
+     * Returns an associative array (with userId as key) containing details (full name, email, userId and avatar) of members of a plan with id `$planId`.
+     *
+     * It does not include the details of the plan creator.
      * @param $planId
-     * @return mixed
+     * @return array
      */
-    public static function getPlanMembersDetailsList($planId)
+    public static function getPlanMembersDetailsList($planId): array
     {
-        return self::join('users', 'users.id', '=', 'plan_members.user_id')
+        $records = self::join('users', 'users.id', '=', 'plan_members.user_id')
                     ->join('user_information', 'user_information.user_id', '=', 'plan_members.user_id')
                     ->where('plan_id', $planId)
-                    ->get([DB::raw("concat(users.first_name, ' ', users.last_name) as full_name"), 'users.email', 'user_information.profile_picture as avatar', 'user_information.country', DB::raw("'member' as role")])
+                    ->get([DB::raw("concat(users.first_name, ' ', users.last_name) as full_name"), 'users.id as userId', 'users.email', 'user_information.profile_picture as avatar', 'user_information.country', DB::raw("'member' as role")])
                     ->toArray();
+        $result = [];
+        foreach ($records as $record) {
+            $result[(int)$record['userId']] = $record;
+        }
+
+        return $result;
     }
 
     /**
