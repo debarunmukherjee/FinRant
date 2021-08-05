@@ -36,11 +36,12 @@ class PlanController extends Controller
         $planRole = $isUserPlanMember ? 'member' : 'creator';
         $planMemberList = PlanMember::getPlanMembersDetailsList($planId);
         $creatorUserDetails = User::getUserDetails($planCreatorId);
-        $planMemberList[] = [
+        $planMemberList[$planCreatorId] = [
             'full_name' => $creatorUserDetails['full_name'],
             'email' => $creatorUserDetails['email'],
             'avatar' => $creatorUserDetails['avatar'],
-            'role' => 'creator'
+            'role' => 'creator',
+            'userId' => $planCreatorId
         ];
         $formattedPlanMemberList = [];
         foreach ($planMemberList as $member) {
@@ -50,13 +51,31 @@ class PlanController extends Controller
             $res['role'] = $member['role'];
             $formattedPlanMemberList[] = $res;
         }
+
+        // Get all the pending transactions for current user to settle debts
+        $pendingTransactions = PlanDebt::getOptimisedTransactionsDataToSettlePlanDebt($planId);
+        if (empty($pendingTransactions[(int)Auth::id()])) {
+            $userPendingTransactions = [];
+        } else {
+            $userPendingTransactions = $pendingTransactions[(int)Auth::id()];
+        }
+        $userPendingTransactionsResponseData = [];
+        foreach ($userPendingTransactions as $userPendingTransaction) {
+            $userPendingTransactionsResponseData[] = [
+                'otherUserEmail' => $planMemberList[$userPendingTransaction['otherUserId']]['email'],
+                'action' => $userPendingTransaction['type'],
+                'amount' => $userPendingTransaction['amount'],
+            ];
+        }
+
         return Inertia::render('Plans/ViewPlan',
             [
                 'planDetails' => $plan,
                 'budgetList' => $budgetList,
                 'categoryList' => $categoryList,
                 'planRole' => $planRole,
-                'planMemberList' => $formattedPlanMemberList
+                'planMemberList' => $formattedPlanMemberList,
+                'userPendingTransactions' => $userPendingTransactionsResponseData
             ]
         );
     }
