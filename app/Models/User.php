@@ -54,7 +54,7 @@ class User extends Authenticatable
      * @param $userId
      * @return array
      */
-    public static function getUserDetails($userId)
+    public static function getUserDetails($userId): array
     {
         $result = self::join('user_information', 'user_information.user_id', '=', 'users.id')
                     ->where('users.id', $userId)
