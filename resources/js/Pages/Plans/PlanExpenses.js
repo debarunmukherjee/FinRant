@@ -218,7 +218,15 @@ export default function PlanExpenses({ planId }) {
                 {getSingleCategoryExpenseForm()}
             </div>
             <div className="mt-4">
-                <Button className="hover:bg-blue-500 bg-blue-400 inline justify-center" onClick={handleRecordExpense}>
+                <Button
+                    className="hover:bg-blue-500 bg-blue-400 inline justify-center"
+                    onClick={handleRecordExpense}
+                    processing={
+                        expenseAmount <= 0 ||
+                        (isSharedExpense && planMemberList.length < 2) ||
+                        (isSharedExpense && !sharedExpenseMembersPaidEqually && sharedExpenseMembersWhoPaid.length < 1)
+                    }
+                >
                     Record expense
                 </Button>
             </div>
