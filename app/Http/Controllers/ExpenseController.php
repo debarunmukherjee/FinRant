@@ -97,13 +97,13 @@ class ExpenseController extends Controller
                 $sharedExpenseMembersPaidEqually
             ) {
                 if (!$isSharedExpense) {
-                    if (Expense::createUnsharedExpenseForUser($userId, $planId, $categoryId, $expenseAmount)) {
+                    if (Expense::createUnsharedExpenseForUser($userId, $planId, $categoryId, round($expenseAmount, 2))) {
                         return true;
                     }
                     return false;
                 }
 
-                $eachAmount = $expenseAmount / $totalMemberCount;
+                $eachAmount = round($expenseAmount / $totalMemberCount, 2);
 
                 // Making a record of the shared expense details
                 $sharedExpenseBatchId = Str::random(64);
@@ -121,6 +121,7 @@ class ExpenseController extends Controller
                     foreach ($planMemberUserIds as $planMemberUserId) {
                         $currentDebt = PlanDebt::getCurrentDebtForUser($planId, $planMemberUserId);
                         $amountPaid = empty($sharedExpenseMembersUserData[$planMemberUserId]) ? 0 : $sharedExpenseMembersUserData[$planMemberUserId];
+                        $amountPaid = round($amountPaid, 2);
                         $result = $result && PlanDebt::saveDebtAmountForUser($planId, $planMemberUserId, $currentDebt + $eachAmount - $amountPaid);
                     }
                 }
