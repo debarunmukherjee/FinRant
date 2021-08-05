@@ -45,7 +45,7 @@ export default function Register() {
                         name="first_name"
                         value={data.first_name}
                         className="mt-1 block w-full"
-                        autoComplete="name"
+                        autoComplete="given-name"
                         isFocused={true}
                         handleChange={onHandleChange}
                         required
@@ -60,10 +60,9 @@ export default function Register() {
                         name="last_name"
                         value={data.last_name}
                         className="mt-1 block w-full"
-                        autoComplete="name"
+                        autoComplete="additional-name"
                         isFocused={true}
                         handleChange={onHandleChange}
-                        required
                     />
                 </div>
 
