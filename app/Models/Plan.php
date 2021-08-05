@@ -47,4 +47,15 @@ class Plan extends Model
     {
         return self::where('created_by', $userId)->orderByDesc('created_at')->get(['plans.*', DB::raw("'creator' as role")])->toArray();
     }
+
+    /**
+     * Returns whether a user has access to record an expense in a plan.
+     * @param $userId
+     * @param $planId
+     * @return bool
+     */
+    public static function userHasPlanExpenseAccess($userId, $planId): bool
+    {
+        return (self::isUserPlanCreator($planId, $userId) || PlanMember::isUserPlanMember($planId, $userId));
+    }
 }
