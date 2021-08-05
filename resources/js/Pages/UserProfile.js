@@ -51,7 +51,7 @@ export default function Dashboard(props) {
                                             <input
                                                 type="text"
                                                 className="w-auto focus:ring-indigo-500 focus:border-indigo-500 flex-1 w-auto inline rounded sm:text-sm border-gray-300"
-                                                placeholder="New expense category"
+                                                placeholder="First Name"
                                                 value={userFirstName}
                                                 onChange={(e) => {setUserFirstName(e.target.value)}}
                                             />
@@ -62,7 +62,7 @@ export default function Dashboard(props) {
                                             <input
                                                 type="text"
                                                 className="w-auto focus:ring-indigo-500 focus:border-indigo-500 flex-1 w-auto inline rounded sm:text-sm border-gray-300"
-                                                placeholder="New expense category"
+                                                placeholder="Last Name"
                                                 value={userLastName}
                                                 onChange={(e) => {setUserLastName(e.target.value)}}
                                             />
@@ -73,7 +73,7 @@ export default function Dashboard(props) {
                                             <input
                                                 type="email"
                                                 className="w-auto focus:ring-indigo-500 focus:border-indigo-500 flex-1 w-auto inline rounded sm:text-sm border-gray-300"
-                                                placeholder="New expense category"
+                                                placeholder="abc@example.com"
                                                 value={userEmail}
                                                 onChange={(e) => {setUserEmail(e.target.value)}}
                                             />
