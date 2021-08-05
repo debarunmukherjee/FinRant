@@ -10,6 +10,7 @@ export default function AutocompleteSelect({ itemsList, selectedValue, itemLabel
             PopperComponent={(props) => {
                 return (<Popper {...props} disablePortal={true} placement='bottom-start'/>);
             }}
+            getOptionSelected={(opt, val) => (itemLabelKey ? opt[itemLabelKey] === val[itemLabelKey] : opt === val)}
             className={customClasses}
             options={itemsList}
             getOptionLabel={(option) => (itemLabelKey ? option[itemLabelKey] : option)}
