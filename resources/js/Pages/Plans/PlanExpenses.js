@@ -189,8 +189,8 @@ export default function PlanExpenses({ planId }) {
                                 </div>
                             </div>
                         ) : ''}
-                        {sharedExpenseMembersWhoPaid.length < 2 ? (
-                            <Alert className="mt-2" severity="error">You have to add at least 2 members belonging to this plan!</Alert>
+                        {sharedExpenseMembersWhoPaid.length === 0 && !sharedExpenseMembersPaidEqually ? (
+                            <Alert className="mt-2" severity="error">You have to add at least 1 member belonging to this plan!</Alert>
                         ) : ''}
                     </>
                 ) : ''}
