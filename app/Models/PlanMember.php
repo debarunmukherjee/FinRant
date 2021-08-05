@@ -49,4 +49,33 @@ class PlanMember extends Model
                     ->get([DB::raw("concat(users.first_name, ' ', users.last_name) as full_name"), 'users.email', 'user_information.profile_picture as avatar', 'user_information.country', DB::raw("'member' as role")])
                     ->toArray();
     }
+
+    /**
+     * Returns the member count of a plan including it's creator.
+     * @param $planId
+     * @return int
+     */
+    public static function getMemberCount($planId): int
+    {
+        return (int)(self::where('plan_id', $planId)->count() + 1);
+    }
+
+    /**
+     * Returns a list of all the users id's in a given plan.
+     * @param $planId
+     * @param bool $includeCreator
+     * @return array
+     */
+    public static function getAllPlanMemberUserIds($planId, bool $includeCreator = true): array
+    {
+        $members = self::where('plan_id', $planId)->get(['user_id'])->toArray();
+        $membersArray = [];
+        foreach ($members as $member) {
+            $membersArray[] = $member['user_id'];
+        }
+        if ($includeCreator) {
+            $membersArray[] = Plan::getPlanCreatorUserId($planId);
+        }
+        return $membersArray;
+    }
 }
