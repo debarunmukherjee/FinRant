@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\ExpendCategory;
 use App\Models\Plan;
 use App\Models\PlanCategoryBudget;
+use App\Models\PlanDebt;
 use App\Models\PlanMember;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
@@ -65,11 +67,17 @@ class PlanController extends Controller
             'name' => ['required', 'max:50'],
             'description' => ['required', 'max:255']
         ]);
-        Plan::create([
-            'name' => $request->post('name'),
-            'description' => $request->post('description'),
-            'created_by' => Auth::id(),
-        ]);
-        return Redirect::back()->with('success', 'Plan successfully created!');
+        $result = DB::transaction(function () use ($request) {
+            $plan = Plan::create([
+                'name' => $request->post('name'),
+                'description' => $request->post('description'),
+                'created_by' => Auth::id(),
+            ]);
+            return !empty($plan) && PlanDebt::createEntryPlanDebtForNewUser($plan->id, Auth::id());
+        });
+        if ($result) {
+            return Redirect::back()->with('success', 'Plan successfully created!');
+        }
+        return Redirect::back()->with('error', 'Plan could not be created!');
     }
 }
