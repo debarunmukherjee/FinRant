@@ -20,7 +20,6 @@ class CreateExpensesTable extends Migration
             $table->foreignId('user_id')->references('id')->on('users');
             $table->boolean('is_shared')->default(0);
             $table->unsignedFloat('amount');
-            $table->unique(['plan_id', 'category_id', 'user_id']);
             $table->timestamps();
         });
     }
