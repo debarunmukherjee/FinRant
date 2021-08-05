@@ -19,12 +19,13 @@ const useStyles = makeStyles((theme) => ({
 /**
  * @param message Message that is to be displayed
  * @param severity Possible values - `success | error | warning | info`
+ * @param open
+ * @param setOpen
  * @returns {JSX.Element}
  * @constructor
  */
-export default function Notification({message, severity}) {
+export default function Notification({message, severity, open, setOpen}) {
     const classes = useStyles();
-    const [open, setOpen] = React.useState(true);
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
