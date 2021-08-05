@@ -1,17 +1,29 @@
 import ApplicationLogo from '../Components/ApplicationLogo';
 import Dropdown from '../Components/Dropdown';
 import NavLink from '../Components/NavLink';
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import ResponsiveNavLink from '../Components/ResponsiveNavLink';
 import {InertiaLink, usePage} from '@inertiajs/inertia-react';
 import Notification from "@/Components/Notification";
 
 export default function Authenticated({ auth, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const [openSuccess, setOpenSuccess] = useState(false);
+    const [openMessage, setOpenMessage] = useState(false);
+    const [openError, setOpenError] = useState(false);
     const { flash } = usePage().props;
-    const message = flash.message;
-    const success = flash.success;
-    const error = flash.error;
+
+    useEffect(() => {
+        if (flash.message) {
+            setOpenMessage(true);
+        }
+        if (flash.success) {
+            setOpenSuccess(true);
+        }
+        if (flash.error) {
+            setOpenError(true);
+        }
+    }, [flash])
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -173,9 +185,9 @@ export default function Authenticated({ auth, header, children }) {
             )}
 
             <main>{children}</main>
-            {message ? (<Notification message={message} severity="info"/>) : ''}
-            {success ? (<Notification message={success} severity="success"/>) : ''}
-            {error ? (<Notification message={error} severity="error"/>) : ''}
+            {flash.message ? (<Notification message={flash.message} open={openMessage} setOpen={setOpenMessage} severity="info"/>) : ''}
+            {flash.success ? (<Notification message={flash.success} open={openSuccess} setOpen={setOpenSuccess} severity="success"/>) : ''}
+            {flash.error ? (<Notification message={flash.error} open={openError} setOpen={setOpenError} severity="error"/>) : ''}
         </div>
     );
 }
