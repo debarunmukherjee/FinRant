@@ -41,7 +41,7 @@ class UserProfileController extends Controller
     {
         $request->validate([
             'firstName' => ['required', 'string', 'max:255'],
-            'lastName' => ['string', 'max:255'],
+            'lastName' => ['string', 'max:255', 'nullable'],
             'country' => ['required', Rule::in(Countries::all()->pluck('name.common')->toArray())],
             'email' => ['email', 'required', Rule::unique('users')->ignore(Auth::id())],
             'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
