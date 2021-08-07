@@ -1,10 +1,16 @@
 import {Autocomplete} from "@material-ui/lab";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Popper} from "@material-ui/core";
 
 export default function AutocompleteSelect({ itemsList, selectedValue, itemLabelKey, setSelectedValue, placeholder, customClasses='' }) {
     const [value, setValue] = useState(selectedValue);
     const [inputValue, setInputValue] = useState('');
+
+    useEffect(() => {
+        setInputValue(itemLabelKey ? selectedValue[itemLabelKey] : selectedValue);
+        setValue(selectedValue);
+    }, [selectedValue]);
+
     return (
         <Autocomplete
             PopperComponent={(props) => {
@@ -18,7 +24,6 @@ export default function AutocompleteSelect({ itemsList, selectedValue, itemLabel
             onChange={(event, newInputValue) => {
                 if (newInputValue) {
                     setSelectedValue(newInputValue);
-                    setValue(newInputValue);
                 }
             }}
             inputValue={inputValue}
