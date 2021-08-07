@@ -49,7 +49,7 @@ export default function Modal({ open, setOpen, title, children, actionText, onCl
                                             <ExclamationIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
                                         </div>
                                     ) : ''}
-                                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:mr-4 sm:text-left w-full">
                                         <Dialog.Title as="h3" className="text-lg leading-6 font-semibold text-gray-900">
                                             {title}
                                         </Dialog.Title>
