@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ExpendCategory;
 use App\Models\Expense;
+use App\Models\PendingPlanDebt;
 use App\Models\Plan;
 use App\Models\PlanDebt;
 use App\Models\PlanMember;
@@ -116,6 +117,7 @@ class ExpenseController extends Controller
                     $userDataToBeSavedInSharedExpenseDetailsTable = $sharedExpenseMembersUserData;
                 }
                 $result = SharedExpenseDetail::saveSharedExpenseDetail($sharedExpenseBatchId, $userDataToBeSavedInSharedExpenseDetailsTable);
+
                 // Make records of the debt of every member in the plan debt maintaining table, in case the amount was not shared equally.
                 if (!$sharedExpenseMembersPaidEqually) {
                     foreach ($planMemberUserIds as $planMemberUserId) {
@@ -123,6 +125,11 @@ class ExpenseController extends Controller
                         $amountPaid = empty($sharedExpenseMembersUserData[$planMemberUserId]) ? 0 : $sharedExpenseMembersUserData[$planMemberUserId];
                         $amountPaid = round($amountPaid, 2);
                         $result = $result && PlanDebt::saveDebtAmountForUser($planId, $planMemberUserId, $currentDebt + $eachAmount - $amountPaid);
+                    }
+
+                    // Recalculate the debts as the expense is shared equally but not every member paid equally.
+                    if ($result) {
+                        PendingPlanDebt::refreshPendingPlanDebts($planId);
                     }
                 }
 
