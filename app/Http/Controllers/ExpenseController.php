@@ -68,7 +68,7 @@ class ExpenseController extends Controller
         $categoryList = array_column(ExpendCategory::getAllCategoriesForCurrentUser(), 'name');
         $isSharedExpense = $request->post('isSharedExpense');
         $planId = $request->post('planId');
-        $categoryId = ExpendCategory::getCategoryIdFromName($request->post('category'));
+        $categoryId = ExpendCategory::getCategoryIdFromName($request->post('category'), $userId);
         $sharedExpenseMembersPaidEqually =  $request->post('sharedExpenseMembersPaidEqually');
         $sharedExpenseMembersWhoPaid =  $request->post('sharedExpenseMembersWhoPaid');
         $expenseAmount = $request->post('amount');

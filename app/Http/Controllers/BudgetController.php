@@ -48,10 +48,10 @@ class BudgetController extends Controller
     private function getBudgetStateChangeRequestParams(Request $request, $isInsert): array
     {
         $categoryName = $request->post('budgetCategoryName');
-        $categoryId = ExpendCategory::where('name', $categoryName)->first()->id;
         $amount = $request->post($this->getBudgetAmountKey($isInsert));
         $planId = $request->post('planId');
         $userId = Auth::id();
+        $categoryId = ExpendCategory::getCategoryIdFromName($categoryName, $userId);
 
         return [$categoryId, $planId, $userId, $amount];
     }

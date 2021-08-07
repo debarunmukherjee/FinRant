@@ -20,9 +20,18 @@ class ExpendCategory extends Model
         return self::select('name')->where('created_by', Auth::id())->get()->toArray();
     }
 
-    public static function getCategoryIdFromName($name)
+    /**
+     * Get the category id from name for a given user.
+     * @param $name
+     * @param $userId
+     * @return int
+     */
+    public static function getCategoryIdFromName($name, $userId): int
     {
-        $result = self::where('name', $name)->first();
+        $result = self::where([
+            ['name', $name],
+            ['created_by', $userId]
+        ])->first();
         return empty($result) ? 0 : $result->id;
     }
 }
