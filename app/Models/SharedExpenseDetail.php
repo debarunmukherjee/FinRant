@@ -33,4 +33,17 @@ class SharedExpenseDetail extends Model
         }
         return $result;
     }
+
+    /**
+     * Returns the shared expense details as an array.
+     * Return array format:
+     *
+     * `[['userIdWhoPaid' => userId, 'amount' => amount]]`
+     * @param $batchId
+     * @return array
+     */
+    public static function getSharedExpenseDetails($batchId): array
+    {
+        return self::where('batch_id', $batchId)->get(['user_id as userIdWhoPaid', 'amount'])->toArray();
+    }
 }
