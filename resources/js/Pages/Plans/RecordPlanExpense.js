@@ -1,53 +1,126 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect} from "react";
 import Button from "@/Components/Button";
 import CustomSwitch from "@/Components/Switch";
-import {usePage} from "@inertiajs/inertia-react";
+import {useForm, usePage} from "@inertiajs/inertia-react";
 import AutocompleteSelect from "@/Components/AutocompleteSelect";
 import {Alert} from "@material-ui/lab";
 import NumberInput from "@/Components/NumberInput";
-import {Inertia} from "@inertiajs/inertia";
+import {PlanContext} from "@/Pages/Plans/ViewPlan";
 
 export default function RecordPlanExpense({ planId }) {
     const { categoryList, errors, planMemberList } = usePage().props;
-    const [isSharedExpense, setIsSharedExpense] = useState(false);
-    const [selectedExpenseCategory, setSelectedExpenseCategory] = useState();
-    const [expenseAmount, setExpenseAmount] = useState(0);
-    const [sharedExpenseMembersWhoPaid, setSharedExpenseMembersWhoPaid ] = useState([]);
-    const [sharedExpenseMemberToBeAdded, setSharedExpenseMemberToBeAdded] = useState();
-    const [sharedExpenseMemberAmount, setSharedExpenseMemberAmount] = useState(0);
-    const [sharedExpenseMembersPaidEqually, setSharedExpenseMembersPaidEqually ] = useState(true);
-    const [sharedMemberExpenseError, setSharedMemberExpenseError] = useState('');
+
+    const { state, dispatch } = useContext(PlanContext);
+    const {
+        isSharedExpense,
+        selectedExpenseCategory,
+        expenseAmount,
+        sharedExpenseMembersWhoPaid,
+        sharedExpenseMemberToBeAdded,
+        sharedExpenseMemberAmount,
+        sharedExpenseMembersPaidEqually,
+        sharedMemberExpenseError
+    } = state;
+
+    const { data, setData, post, processing, clearErrors } = useForm({
+        isSharedExpense: false,
+        category: '',
+        amount: 0,
+        planId: 0,
+        sharedExpenseMembersPaidEqually: true,
+        sharedExpenseMembersWhoPaid: []
+    });
 
     useEffect(() => {
-        if (categoryList.length > 0) {
-            setSelectedExpenseCategory(categoryList[0]);
-        }
-        setSharedExpenseMemberToBeAdded(planMemberList[0]);
-    },[]);
-
-    useEffect(() => {
-        if (!errors.isSharedExpense && !errors.category && !errors.amount && !errors.planId && !errors.sharedExpenseMembersPaidEqually && !errors.sharedExpenseMembersWhoPaid) {
-            setIsSharedExpense(false);
-            if (categoryList.length > 0) {
-                setSelectedExpenseCategory(categoryList[0]);
-            }
-            setSharedExpenseMemberToBeAdded(planMemberList[0]);
-            setExpenseAmount(0);
-            setSharedExpenseMembersWhoPaid([]);
-            setSharedExpenseMemberAmount(0);
-            setSharedExpenseMembersPaidEqually(true);
-            setSharedMemberExpenseError('');
-        }
-    },[errors]);
-
-    const handleRecordExpense = () => {
-        Inertia.post('/expense/add', {
+        setData({
+            ...data,
             isSharedExpense: isSharedExpense,
-            category: selectedExpenseCategory.name,
+            category: selectedExpenseCategory ? selectedExpenseCategory.name : '',
             amount: expenseAmount,
             planId: planId,
             sharedExpenseMembersPaidEqually: sharedExpenseMembersPaidEqually,
             sharedExpenseMembersWhoPaid: sharedExpenseMembersWhoPaid
+        });
+    }, [])
+
+    const setSelectedExpenseCategory = (val) => {
+        setData('category', val.name);
+        dispatch({
+            ...state,
+            selectedExpenseCategory: val
+        });
+    }
+
+    const setSharedExpenseMemberToBeAdded = (val) => {
+        dispatch({
+            ...state,
+            sharedExpenseMemberToBeAdded: val
+        });
+    }
+
+    const setExpenseAmount = (val) => {
+        setData('amount', val);
+        dispatch({
+            ...state,
+            expenseAmount: val
+        });
+    }
+
+    const setSharedExpenseMemberAmount = (val) => {
+        dispatch({
+            ...state,
+            sharedExpenseMemberAmount: val
+        });
+    }
+
+    const setSharedExpenseMembersPaidEqually = (val) => {
+        setData('sharedExpenseMembersPaidEqually', val);
+        dispatch({
+            ...state,
+            sharedExpenseMembersPaidEqually: val
+        });
+    }
+
+    const setSharedMemberExpenseError = (val) => {
+        dispatch({
+            ...state,
+            sharedMemberExpenseError: val
+        });
+    }
+
+    const setIsSharedExpense = (val) => {
+        setData('isSharedExpense', val);
+        dispatch({
+            ...state,
+            isSharedExpense: val
+        });
+    }
+
+    const handleRecordExpense = (e) => {
+        e.preventDefault();
+        post('/expense/add', {
+            onSuccess: () => {
+                clearErrors();
+                setData({
+                    isSharedExpense: false,
+                    category: categoryList.length > 0 ? categoryList[0].name : '',
+                    amount: 0,
+                    planId: planId,
+                    sharedExpenseMembersPaidEqually: true,
+                    sharedExpenseMembersWhoPaid: []
+                });
+                dispatch({
+                    ...state,
+                    isSharedExpense: false,
+                    selectedExpenseCategory: categoryList.length > 0 ? categoryList[0] : null,
+                    expenseAmount: 0,
+                    sharedExpenseMembersWhoPaid: [],
+                    sharedExpenseMemberToBeAdded: planMemberList[0],
+                    sharedExpenseMemberAmount: 0,
+                    sharedExpenseMembersPaidEqually: true,
+                    sharedMemberExpenseError: '',
+                });
+            }
         });
     }
 
@@ -62,24 +135,48 @@ export default function RecordPlanExpense({ planId }) {
                 totalAmount += member.amount
             })
             totalAmount += sharedExpenseMemberAmount;
-            setExpenseAmount(totalAmount);
-            setSharedExpenseMembersWhoPaid([
+            const newListOfSharedExpenseMembersWhoPaid = [
                 ...sharedExpenseMembersWhoPaid,
                 {
                     email: sharedExpenseMemberToBeAdded.email,
                     amount: sharedExpenseMemberAmount,
                     fullName: sharedExpenseMemberToBeAdded.fullName,
                 }
-            ]);
-            setSharedExpenseMemberToBeAdded(planMemberList[0]);
-            setSharedExpenseMemberAmount(0);
-            setSharedMemberExpenseError('');
+            ];
+            setData({
+                ...data,
+                sharedExpenseMembersWhoPaid: newListOfSharedExpenseMembersWhoPaid,
+                amount: totalAmount
+            });
+            dispatch({
+                ...state,
+                expenseAmount: totalAmount,
+                sharedExpenseMembersWhoPaid: newListOfSharedExpenseMembersWhoPaid,
+                sharedExpenseMemberToBeAdded: planMemberList[0],
+                sharedExpenseMemberAmount: 0,
+                sharedMemberExpenseError: ''
+            });
         }
     }
 
     const removeSharedExpenseMember = (email) => {
-        setSharedMemberExpenseError('');
-        setSharedExpenseMembersWhoPaid(sharedExpenseMembersWhoPaid.filter((member) => member.email !== email));
+        const newListOfSharedExpenseMembersWhoPaid = sharedExpenseMembersWhoPaid.filter((member) => member.email !== email);
+        let totalAmount = 0;
+        newListOfSharedExpenseMembersWhoPaid.forEach((member) => {
+            totalAmount += member.amount
+        });
+        setData({
+            ...data,
+            sharedExpenseMembersWhoPaid: newListOfSharedExpenseMembersWhoPaid,
+            amount: totalAmount
+        });
+        dispatch({
+            ...state,
+            expenseAmount: totalAmount,
+            sharedMemberExpenseError: '',
+            sharedExpenseMembersWhoPaid: newListOfSharedExpenseMembersWhoPaid,
+            sharedExpenseMemberToBeAdded: planMemberList[0],
+        })
     }
 
     const getSingleCategoryExpenseForm = () => {
@@ -96,7 +193,7 @@ export default function RecordPlanExpense({ planId }) {
                         setSelectedValue={setSelectedExpenseCategory}
                         placeholder="Search Category"
                     />
-                ) : (<Alert severity="info">Please create a category first!</Alert>)}
+                ) : (<Alert severity="info" className="max-w-full sm:max-w-3/4">Please create a category first!</Alert>)}
                 <div className="mt-8">
                     <label htmlFor="expense_amt" className="block text-sm font-medium text-gray-700">
                         Expense Amount
@@ -140,7 +237,7 @@ export default function RecordPlanExpense({ planId }) {
                                         placeholder="Enter amount"
                                         customClasses="m-2"
                                     />
-                                    <Button className="hover:bg-blue-500 bg-blue-400 inline justify-center w-full sm:w-auto m-2" onClick={addSharedPaymentMember} processing={sharedExpenseMembersPaidEqually}>
+                                    <Button type="button" className="hover:bg-blue-500 bg-blue-400 inline justify-center w-full sm:w-auto m-2" onClick={addSharedPaymentMember} processing={sharedExpenseMembersPaidEqually}>
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
@@ -207,7 +304,7 @@ export default function RecordPlanExpense({ planId }) {
                             </div>
                         ) : ''}
                         {sharedExpenseMembersWhoPaid.length === 0 && !sharedExpenseMembersPaidEqually ? (
-                            <Alert className="mt-2" severity="error">You have to add at least 1 member belonging to this plan!</Alert>
+                            <Alert className="mt-2 max-w-full sm:max-w-3/4" severity="error">You have to add at least 1 member belonging to this plan!</Alert>
                         ) : ''}
                     </>
                 ) : ''}
@@ -217,36 +314,39 @@ export default function RecordPlanExpense({ planId }) {
 
     return (
         <div className="mt-12">
-            <h2 className="font-semibold mb-5 text-xl sm:text-2xl">Record Expense</h2>
-            <div className="mt-4">
-                <CustomSwitch
-                    isEnabled={isSharedExpense}
-                    setIsEnabled={(value) => {
-                        if (planMemberList.length > 2) {
-                            setIsSharedExpense(value);
+            <form onSubmit={handleRecordExpense}>
+                <h2 className="font-semibold mb-5 text-xl sm:text-2xl">Record Expense</h2>
+                <div className="mt-4">
+                    <CustomSwitch
+                        isEnabled={isSharedExpense}
+                        setIsEnabled={(value) => {
+                            if (planMemberList.length >= 2) {
+                                setIsSharedExpense(value);
+                            }
+                        }}
+                        labelText="Share equally among all members? "
+                        shouldDisplayYesNo={true}
+                    />
+                    <p className="text-xs mb-1">Requires at least 2 members in your plan.</p>
+                </div>
+                <div className="mt-2">
+                    {getSingleCategoryExpenseForm()}
+                </div>
+                <div className="mt-4">
+                    <Button
+                        className="hover:bg-blue-500 bg-blue-400 inline justify-center"
+                        processing={
+                            expenseAmount <= 0 ||
+                            (isSharedExpense && planMemberList.length < 2) ||
+                            (isSharedExpense && !sharedExpenseMembersPaidEqually && sharedExpenseMembersWhoPaid.length < 1) ||
+                            !selectedExpenseCategory ||
+                            processing
                         }
-                    }}
-                    labelText="Share equally among all members? "
-                    shouldDisplayYesNo={true}
-                />
-                <p className="text-xs mb-1">Requires at least 2 members in your plan.</p>
-            </div>
-            <div className="mt-2">
-                {getSingleCategoryExpenseForm()}
-            </div>
-            <div className="mt-4">
-                <Button
-                    className="hover:bg-blue-500 bg-blue-400 inline justify-center"
-                    onClick={handleRecordExpense}
-                    processing={
-                        expenseAmount <= 0 ||
-                        (isSharedExpense && planMemberList.length < 2) ||
-                        (isSharedExpense && !sharedExpenseMembersPaidEqually && sharedExpenseMembersWhoPaid.length < 1)
-                    }
-                >
-                    Record expense
-                </Button>
-            </div>
+                    >
+                        Record expense
+                    </Button>
+                </div>
+            </form>
         </div>
     )
 }
