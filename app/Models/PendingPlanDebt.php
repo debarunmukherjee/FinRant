@@ -59,4 +59,55 @@ class PendingPlanDebt extends Model
             ['plan_id', $planId]
         ])->get(['dest_user_id as otherUserId', 'amount', 'action'])->toArray();
     }
+
+    /**
+     * Returns the amount that a user needs to pay to another user in a plan, to settle dues.
+     * @param $planId
+     * @param $srcUserId
+     * @param $destUserId
+     * @return float
+     */
+    public static function getAmountUserNeedsToPayToAnotherUser($planId, $srcUserId, $destUserId): float
+    {
+        $result = self::where([
+            ['plan_id', $planId],
+            ['src_user_id', $srcUserId],
+            ['dest_user_id', $destUserId],
+            ['action', 'pay'],
+        ])->get(['amount'])->first();
+        return empty($result) ? 0 : (float)$result->amount;
+    }
+
+    /**
+     * Settles a debt between 2 users by deleting the entries from the
+     * @param $planId
+     * @param $srcUserId
+     * @param $destUserId
+     * @return bool
+     */
+    public static function settleDebtBetweenUsers($planId, $srcUserId, $destUserId): bool
+    {
+        return DB::transaction(
+            function () use ($planId, $srcUserId, $destUserId) {
+                // Currently for every transaction to be made, we create 2 entries are made in the pending_plan_debts table.
+                // Other is pay and the other is receive. We need delete both of there when a debt is resolved.
+                $dueTransactionAmount = self::getAmountUserNeedsToPayToAnotherUser($planId, $srcUserId, $destUserId);
+                $result = (bool)self::where([
+                    ['plan_id', $planId],
+                    ['src_user_id', $srcUserId],
+                    ['dest_user_id', $destUserId],
+                ])->delete();
+                $result = $result && (bool)self::where([
+                    ['plan_id', $planId],
+                    ['src_user_id', $destUserId],
+                    ['dest_user_id', $srcUserId],
+                ])->delete();
+
+                $currentPendingAmountForUserWhoPaid = PlanDebt::getCurrentDebtForUser($planId, $srcUserId);
+                $currentPendingAmountForUserWhoReceived = PlanDebt::getCurrentDebtForUser($planId, $destUserId);
+                $result = $result && PlanDebt::saveDebtAmountForUser($planId, $srcUserId, $currentPendingAmountForUserWhoPaid - $dueTransactionAmount);
+                return $result && PlanDebt::saveDebtAmountForUser($planId, $destUserId, $currentPendingAmountForUserWhoReceived + $dueTransactionAmount);
+            }
+        );
+    }
 }
