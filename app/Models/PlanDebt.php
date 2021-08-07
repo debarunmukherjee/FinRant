@@ -121,10 +121,13 @@ class PlanDebt extends Model
      * It uses 2 max heaps - one for the users who owe and another for the users who are owed. Then it iteratively
      * generates a set of transactions until both the heaps are empty. Worst case time complexity is `O(n*log(n))`, where
      * `n` is the number of members in the plan.
-     *
-     * Return array format : [
-     *      [userId => ['type' => 'pay|receive', 'otherUserId' => otherUserId, 'amount' => amount]]
+     * <br/><br/>
+     * Return array format :
+     * ```
+     * [
+     *      userId => [['type' => 'pay|receive', 'otherUserId' => otherUserId, 'amount' => amount]]
      * ]
+     * ```
      * @param $planId
      * @return array
      */

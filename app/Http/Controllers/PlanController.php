@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\ExpendCategory;
+use App\Models\Expense;
+use App\Models\PendingPlanDebt;
 use App\Models\Plan;
 use App\Models\PlanCategoryBudget;
 use App\Models\PlanDebt;
 use App\Models\PlanMember;
 use App\Models\User;
+use DateTime;
+use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -53,18 +57,37 @@ class PlanController extends Controller
         }
 
         // Get all the pending transactions for current user to settle debts
-        $pendingTransactions = PlanDebt::getOptimisedTransactionsDataToSettlePlanDebt($planId);
-        if (empty($pendingTransactions[(int)Auth::id()])) {
-            $userPendingTransactions = [];
-        } else {
-            $userPendingTransactions = $pendingTransactions[(int)Auth::id()];
-        }
+        $pendingTransactions = PendingPlanDebt::getAllPendingPlanTransactionsForUser($planId, Auth::id());
         $userPendingTransactionsResponseData = [];
-        foreach ($userPendingTransactions as $userPendingTransaction) {
+        foreach ($pendingTransactions as $transaction) {
             $userPendingTransactionsResponseData[] = [
-                'otherUserEmail' => $planMemberList[$userPendingTransaction['otherUserId']]['email'],
-                'action' => $userPendingTransaction['type'],
-                'amount' => $userPendingTransaction['amount'],
+                'otherUserEmail' => $planMemberList[$transaction['otherUserId']]['email'],
+                'action' => $transaction['action'],
+                'amount' => $transaction['amount'],
+            ];
+        }
+
+        // Get all the expenses data for the user in the plan
+        $allExpensesData = Expense::getAllUserExpenses($planId, Auth::id());
+        $formattedAllExpensesData = [];
+        foreach ($allExpensesData as $allExpensesDatum) {
+            $formattedSharedExpenseDetails = [];
+            if ($allExpensesDatum['isShared']) {
+                foreach ($allExpensesDatum['shareDetails'] as $shareDetail) {
+                    $formattedSharedExpenseDetails[] = [
+                        'userEmailWhoPaid' => $planMemberList[$shareDetail['userIdWhoPaid']]['email'],
+                        'amount' => $shareDetail['amount']
+                    ];
+                }
+            }
+            $createdAt = new DateTime($allExpensesDatum['createdAt']);
+            $createdAt->setTimezone(new DateTimeZone('Asia/Kolkata'));
+            $formattedAllExpensesData[] = [
+                'categoryName' => $allExpensesDatum['categoryName'],
+                'amount' => $allExpensesDatum['amount'],
+                'isShared' => $allExpensesDatum['isShared'],
+                'shareDetails' => $formattedSharedExpenseDetails,
+                'createdAt' => $createdAt->format('D, Y-m-d H:i:s')
             ];
         }
 
@@ -75,7 +98,8 @@ class PlanController extends Controller
                 'categoryList' => $categoryList,
                 'planRole' => $planRole,
                 'planMemberList' => $formattedPlanMemberList,
-                'userPendingTransactions' => $userPendingTransactionsResponseData
+                'userPendingTransactions' => $userPendingTransactionsResponseData,
+                'allUserExpenses' => $formattedAllExpensesData
             ]
         );
     }
