@@ -1,12 +1,51 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Table from "@/Components/Table";
 import PaymentIcon from "@material-ui/icons/Payment";
 import {Alert} from "@material-ui/lab";
 import {usePage} from "@inertiajs/inertia-react";
 import {Divider} from "@material-ui/core";
+import Modal from "@/Components/Modal";
+import {Inertia} from "@inertiajs/inertia";
 
 export default function PlanExpenses({ planId }) {
-    const { userPendingTransactions, planMemberList, allUserExpenses } = usePage().props;
+    const { userPendingTransactions, planMemberList, allUserExpenses, errors } = usePage().props;
+    const [ openPaymentModal, setOpenPaymentModal ] = useState(false);
+    const [ selectedUserEmail, setSelectedUserEmail ] = useState('');
+    const [ paymentAmount, setPaymentAmount ] = useState(0);
+    const [ userPassword, setUserPassword ] = useState('');
+    const [ userPasswordError, setUserPasswordError ] = useState('');
+
+    useEffect(() => {
+        if (errors.password) {
+            setUserPasswordError(errors.password);
+        } else {
+            setUserPasswordError('');
+            setUserPassword('');
+        }
+    },[errors]);
+
+    const handlePayment = () => {
+        Inertia.post('/settle-dues', {
+            destUserEmail: selectedUserEmail,
+            amount: paymentAmount,
+            password: userPassword,
+            planId: planId
+        });
+    }
+
+    const handlePayButtonClick = (email, amount) => {
+        setSelectedUserEmail(email);
+        setPaymentAmount(amount);
+        setOpenPaymentModal(true);
+    }
+
+    const handleModalOpen = (isOpen) => {
+        if (!isOpen) {
+            setUserPasswordError('');
+            setUserPassword('');
+        }
+        setOpenPaymentModal(isOpen);
+    }
 
     const getFullNameFromEmail = (email) => planMemberList.filter((member) => member.email === email)[0].fullName
     return (
@@ -37,7 +76,11 @@ export default function PlanExpenses({ planId }) {
                                 <div className="text-sm text-gray-900 font-semibold">{userPendingTransaction.amount}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-blue-400">
-                                {userPendingTransaction.action === 'pay' ? (<span className="cursor-pointer"><PaymentIcon/></span>) : (
+                                {userPendingTransaction.action === 'pay' ? (
+                                    <span className="cursor-pointer" onClick={() => handlePayButtonClick(userPendingTransaction.otherUserEmail, userPendingTransaction.amount)}>
+                                        <PaymentIcon/>
+                                    </span>
+                                ) : (
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                     </svg>
@@ -90,6 +133,41 @@ export default function PlanExpenses({ planId }) {
                     ))}
                 </Table>
             ) : (<Alert className="mt-2 max-w-full sm:max-w-3/4" severity="info">You have not made any expense in this plan.</Alert>)}
+            <Modal title="Settle Due" open={openPaymentModal} setOpen={handleModalOpen} actionText="Proceed To Payment" onClickAction={handlePayment}>
+                <div className="mt-4">
+                    <p className="block font-medium">
+                        <span className="text-gray-700">Email: </span> <span className="font-semibold">{selectedUserEmail}</span>
+                    </p>
+                    <p className="block font-medium mt-5">
+                        <span className="text-gray-700">Full Name: </span> <span className="font-semibold">
+                            {selectedUserEmail ? getFullNameFromEmail(selectedUserEmail) : ''}
+                    </span>
+                    </p>
+                    <p className="block font-medium mt-5">
+                        <span className="text-gray-700">Amount: </span> <span className="font-semibold">{paymentAmount}</span>
+                    </p>
+                </div>
+                <div className="mt-2">
+                    <Divider style={{marginTop: '0.75rem', marginBottom: '0.75rem'}} />
+                    <label htmlFor="user_password" className="block font-medium text-gray-700">
+                        Enter Password
+                    </label>
+                    <div className="mt-1">
+                        <input
+                            type="password"
+                            className="w-auto focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300"
+                            value={userPassword}
+                            onChange={(e) => {
+                                setUserPassword(e.target.value);
+                            }}
+                        />
+                    </div>
+                    <p className="mt-2 text-sm text-gray-500">
+                        Enter password to continue payment.
+                    </p>
+                </div>
+                {userPasswordError ? <Alert className="mt-2" severity="error">{userPasswordError}</Alert> : ''}
+            </Modal>
         </div>
     );
 }
