@@ -28,7 +28,13 @@ class PlanMember extends Model
             ->toArray();
     }
 
-    public static function isUserPlanMember($planId, $userId)
+    /**
+     * Returns whether a user is a **only** a plan member or not. It will return `false` for the plan creator user id.
+     * @param $planId
+     * @param $userId
+     * @return bool
+     */
+    public static function isUserPlanMember($planId, $userId): bool
     {
         return self::where([
             ['plan_id', $planId],
