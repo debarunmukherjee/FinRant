@@ -6,6 +6,8 @@ import AutocompleteSelect from "@/Components/AutocompleteSelect";
 import {Alert} from "@material-ui/lab";
 import NumberInput from "@/Components/NumberInput";
 import {PlanContext} from "@/Pages/Plans/ViewPlan";
+import {Divider} from "@material-ui/core";
+import MemberExpenseTransaction from "@/Pages/Plans/MemberExpenseTransaction";
 
 export default function RecordPlanExpense({ planId }) {
     const { categoryList, errors, planMemberList } = usePage().props;
@@ -219,7 +221,7 @@ export default function RecordPlanExpense({ planId }) {
                         </div>
                         {!sharedExpenseMembersPaidEqually ? (
                             <div className="mt-6">
-                                <label htmlFor="expense_amt" className="block text-sm font-medium text-gray-700">
+                                <label className="block text-sm font-medium text-gray-700">
                                     Add member(s) who paid
                                 </label>
                                 <div className="flex flex-col sm:flex-row">
@@ -316,6 +318,7 @@ export default function RecordPlanExpense({ planId }) {
         <div className="mt-12">
             <form onSubmit={handleRecordExpense}>
                 <h2 className="font-semibold mb-5 text-xl sm:text-2xl">Record Expense</h2>
+                <Divider className="w-2/3" style={{marginTop: '0.75rem', marginBottom: '0.5rem'}} />
                 <div className="mt-4">
                     <CustomSwitch
                         isEnabled={isSharedExpense}
@@ -347,6 +350,7 @@ export default function RecordPlanExpense({ planId }) {
                     </Button>
                 </div>
             </form>
+            <MemberExpenseTransaction/>
         </div>
     )
 }
