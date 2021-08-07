@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InviteUserController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/invite/accept', [InviteUserController::class, 'acceptInvite']);
     Route::put('/invite/reject', [InviteUserController::class, 'rejectInvite']);
     Route::post('/expense/add', [ExpenseController::class, 'createExpense']);
+    Route::post('/settle-dues', [TransactionController::class, 'clearDebt']);
 });
 
 require __DIR__.'/auth.php';
