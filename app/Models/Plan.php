@@ -49,7 +49,7 @@ class Plan extends Model
     }
 
     /**
-     * Returns whether a user has access to record an expense in a plan.
+     * Returns whether a user has access to record an expense or be involved in a transaction in a plan.
      * @param $userId
      * @param $planId
      * @return bool
