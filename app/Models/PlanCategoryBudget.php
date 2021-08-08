@@ -17,6 +17,11 @@ class PlanCategoryBudget extends Model
         'plan_id',
     ];
 
+    /**
+     * Returns the budget list of a plan for the currently authorised users in the form of an eloquent object
+     * @param $planId
+     * @return mixed
+     */
     public static function getBudgetListForCurrentPlan($planId)
     {
         return self::select('name', 'amount')
@@ -28,6 +33,14 @@ class PlanCategoryBudget extends Model
             ->get();
     }
 
+    /**
+     * Logs an activity message when a user sets a budget
+     * @param $categoryName
+     * @param $amount
+     * @param $planId
+     * @param $userId
+     * @return bool
+     */
     public static function logBudgetCreationActivityMessages($categoryName, $amount, $planId, $userId): bool
     {
         $userDetails = User::getUserDetails($userId);

@@ -75,4 +75,21 @@ class Plan extends Model
             self::userHasPlanExpenseAccess($destUserId, $planId)
         );
     }
+
+    /**
+     * Returns an array of messages that needs to be logged as activity when a new plan is created.
+     * @param $planId
+     * @param $userId
+     * @return string[]
+     */
+    public static function getActivityMessagesForNewPlanCreation($planId, $userId): array
+    {
+        $userDetails = User::getUserDetails($userId);
+        $planDetails = self::getPlanDetails($planId);
+        return [
+            'Ahoy! ' . PlanActivity::getFormattedUserFullnameForActivityMessage($userDetails['full_name']) . " created the plan <i><b>" . $planDetails->name . "</b></i>",
+            'You can now set budgets for different categories for the plan, invite and collaborate with other people, share and track your expenses and much more!',
+            'The <b>FinRant</b> bot 🤖 wishes you happy savings!'
+        ];
+    }
 }
