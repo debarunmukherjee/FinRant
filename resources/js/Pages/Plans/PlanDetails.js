@@ -8,6 +8,7 @@ import Modal from "@/Components/Modal";
 import Select from "@/Components/Select";
 import {Alert} from "@material-ui/lab";
 import BudgetList from "@/Pages/Plans/BudgetList";
+import Table from "@/Components/Table";
 
 export default function PlanDetails({ id }) {
     const { errors, categoryList, budgetList } = usePage().props;
@@ -97,6 +98,24 @@ export default function PlanDetails({ id }) {
                         </Button>
                     </div>
                     {errors.categoryName ? (<p className="text-red-500 text-xs mt-1">{errors.categoryName}</p>) : ''}
+                    <div className="mt-12">
+                        <h2 className="font-semibold mb-5 text-xl text-center sm:text-2xl">Your Categories:</h2>
+                        {categoryList.length > 0 ? (
+                            <Table headers={['Name']}>
+                                {categoryList.map((category, index) => (
+                                    <tr key={index}>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center">
+                                                <div className="ml-4">
+                                                    <div className="text-sm font-medium text-gray-900">{category.name}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </Table>
+                        ) : (<Alert severity="info">You created any categories.</Alert>)}
+                    </div>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <div className="flex sm:flex-row-reverse flex-col">
