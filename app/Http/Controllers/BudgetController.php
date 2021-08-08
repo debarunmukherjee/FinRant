@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ExpendCategory;
+use App\Models\Plan;
 use App\Models\PlanCategoryBudget;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,12 +23,24 @@ class BudgetController extends Controller
 
         $request->validate(
             [
-                'planId' => ['required', 'numeric', 'exists:plans,id'],
+                'planId' => [
+                    'required',
+                    'numeric',
+                    'exists:plans,id',
+                    function ($attribute, $value, $fail) use($userId) {
+                        if (!Plan::userHasPlanExpenseAccess($userId, $value)) {
+                            $fail("You don't have access to this resource.");
+                        }
+                    }
+                ],
                 'budgetCategoryName' => [
                     'required',
                     'string',
                     'exists:expend_categories,name',
                     function ($attribute, $value, $fail) use($planId, $userId, $categoryId, $isInsert) {
+                        if (empty($categoryId)) {
+                            $fail('Invalid Category.');
+                        }
                         $checkUniqueTripletExistence = PlanCategoryBudget::
                             where('category_id', $categoryId)
                             ->where('plan_id', $planId)
