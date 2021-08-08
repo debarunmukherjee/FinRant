@@ -50,28 +50,26 @@ export default function PlanActivity({ planId }) {
                     </div>
                 ) : (
                     Object.keys(planActivities).map((key) => (
-                            <>
-                                <div className="mt-8" key={key}>
-                                    <div className="flex items-end justify-end">
-                                        <div className="flex flex-col space-y-2 text-xs xs:text-sm max-w-3/4 mx-2 order-1 items-end">
-                                            {planActivities[key].map((activity, index) => (
-                                                <div>
-                                                    <p
-                                                        dangerouslySetInnerHTML={{__html: activity.message}}
-                                                        className={`px-4 py-2 rounded-lg inline-block ${index === (planActivities[key].length-1) ? 'rounded-br-none' : ''} bg-blue-600 text-white `}
-                                                    >
-                                                    </p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <img
-                                            src={`/storage/images/bot.png`}
-                                            alt="Bot Image"
-                                            className="w-8 h-8 order-2"
-                                        />
+                            <div className="mt-8" key={key}>
+                                <div className="flex items-end justify-end">
+                                    <div className="flex flex-col space-y-2 text-xs xs:text-sm max-w-3/4 mx-2 order-1 items-end">
+                                        {planActivities[key].map((activity, index) => (
+                                            <div key={`${key}-item-${index}`}>
+                                                <p
+                                                    dangerouslySetInnerHTML={{__html: activity.message}}
+                                                    className={`px-4 py-2 rounded-lg inline-block ${index === (planActivities[key].length-1) ? 'rounded-br-none' : ''} bg-blue-600 text-white `}
+                                                >
+                                                </p>
+                                            </div>
+                                        ))}
                                     </div>
+                                    <img
+                                        src={`/storage/images/bot.png`}
+                                        alt="Bot Image"
+                                        className="w-8 h-8 order-2"
+                                    />
                                 </div>
-                            </>
+                            </div>
                         ))
                     )
                 }
