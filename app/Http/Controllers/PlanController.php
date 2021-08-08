@@ -6,6 +6,7 @@ use App\Models\ExpendCategory;
 use App\Models\Expense;
 use App\Models\PendingPlanDebt;
 use App\Models\Plan;
+use App\Models\PlanActivity;
 use App\Models\PlanCategoryBudget;
 use App\Models\PlanDebt;
 use App\Models\PlanMember;
@@ -111,12 +112,18 @@ class PlanController extends Controller
             'description' => ['required', 'max:255']
         ]);
         $result = DB::transaction(function () use ($request) {
+            $planName = $request->post('name');
             $plan = Plan::create([
-                'name' => $request->post('name'),
+                'name' => $planName,
                 'description' => $request->post('description'),
                 'created_by' => Auth::id(),
             ]);
-            return !empty($plan) && PlanDebt::createEntryPlanDebtForNewUser($plan->id, Auth::id());
+            if (!empty($plan)) {
+                $result = PlanActivity::createPlanActivity($plan->id, Plan::getActivityMessagesForNewPlanCreation($plan->id, Auth::id()));
+            } else {
+                $result = false;
+            }
+            return $result && PlanDebt::createEntryPlanDebtForNewUser($plan->id, Auth::id());
         });
         if ($result) {
             return Redirect::back()->with('success', 'Plan successfully created!');
