@@ -25,9 +25,10 @@ class Expense extends Model
      * @param $planId
      * @param $categoryId
      * @param $amount
+     * @param string $transactionId
      * @return bool
      */
-    public static function createUnsharedExpenseForUser($userId, $planId, $categoryId, $amount): bool
+    public static function createUnsharedExpenseForUser($userId, $planId, $categoryId, $amount, $transactionId = ''): bool
     {
         $expense = new Expense;
         $expense->category_id = $categoryId;
@@ -36,6 +37,9 @@ class Expense extends Model
         $expense->is_shared = false;
         $expense->plan_id = $planId;
 
+        if (!empty($transactionId)) {
+            $expense->transaction_id = $transactionId;
+        }
         return $expense->save();
     }
 
