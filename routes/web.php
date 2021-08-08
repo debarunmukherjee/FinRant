@@ -4,6 +4,7 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InviteUserController;
+use App\Http\Controllers\PlanActivityController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserProfileController;
@@ -51,6 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/expense/add', [ExpenseController::class, 'createExpense']);
     Route::post('/settle-dues', [TransactionController::class, 'clearDebt']);
     Route::post('/user/plan/fund-transfer', [TransactionController::class, 'interPlanFundTransfer']);
+    Route::get('/plan-activities', [PlanActivityController::class, 'getActivities']);
 });
 
 require __DIR__.'/auth.php';
