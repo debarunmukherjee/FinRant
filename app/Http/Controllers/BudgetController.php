@@ -8,6 +8,7 @@ use App\Models\PlanCategoryBudget;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 
 class BudgetController extends Controller
@@ -75,12 +76,21 @@ class BudgetController extends Controller
 
         $this->performBudgetStateChangeValidations($categoryId, $planId, $userId, $request, true);
 
-        $budget = new PlanCategoryBudget;
-        $budget->category_id = $categoryId;
-        $budget->plan_id = $planId;
-        $budget->user_id = $userId;
-        $budget->amount = $amount;
-        $result = $budget->save();
+        $result = DB::transaction(function () use ($categoryId, $planId, $userId, $amount, $request) {
+            $budget = new PlanCategoryBudget;
+            $budget->category_id = $categoryId;
+            $budget->plan_id = $planId;
+            $budget->user_id = $userId;
+            $budget->amount = $amount;
+            $result = $budget->save();
+
+            return $result && PlanCategoryBudget::logBudgetCreationActivityMessages(
+                    $request->post('budgetCategoryName'),
+                    $amount,
+                    $planId,
+                    $userId
+                );
+        });
 
         if (!$result) {
             return Redirect::back()->with('error', 'Could not set budget');

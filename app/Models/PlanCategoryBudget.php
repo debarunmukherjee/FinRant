@@ -27,4 +27,16 @@ class PlanCategoryBudget extends Model
             ])
             ->get();
     }
+
+    public static function logBudgetCreationActivityMessages($categoryName, $amount, $planId, $userId): bool
+    {
+        $userDetails = User::getUserDetails($userId);
+        $messages = [
+            'Way to go!',
+            PlanActivity::getFormattedUserFullnameForActivityMessage($userDetails['full_name']) . " just set a budget of <b>$amount " .
+            UserInformation::getUserCurrencyCode($userId) . "</b> for <b>$categoryName</b>."
+        ];
+
+        return PlanActivity::createPlanActivity($planId, $messages);
+    }
 }
