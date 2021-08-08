@@ -6,8 +6,9 @@ import AutocompleteSelect from "@/Components/AutocompleteSelect";
 import {Alert} from "@material-ui/lab";
 import NumberInput from "@/Components/NumberInput";
 import {usePage} from "@inertiajs/inertia-react";
+import {Inertia} from "@inertiajs/inertia";
 
-export default function MemberExpenseTransaction() {
+export default function MemberExpenseTransaction({ planId }) {
     const { categoryList, errors, planMemberList } = usePage().props;
     const [ openPaymentModal, setOpenPaymentModal ] = useState(false);
     const [ selectedUserToPay, setSelectedUserToPay ] = useState();
@@ -39,11 +40,11 @@ export default function MemberExpenseTransaction() {
         }
     }
     useEffect(() => {
-        if (errors.userPassword || errors.selectedUserToPay || errors.amountToPay || errors.selectedExpenseCategoryToPay) {
-            setUserPasswordError(errors.userPassword);
-            setSelectedUserToPayError(errors.selectedUserToPay);
-            setAmountToPayError(errors.amountToPay);
-            setSelectedExpenseCategoryToPayError(errors.selectedExpenseCategoryToPay);
+        if (errors.password || errors.selectedUserEmail || errors.amount || errors.category) {
+            setUserPasswordError(errors.password);
+            setSelectedUserToPayError(errors.selectedUserEmail);
+            setAmountToPayError(errors.amount);
+            setSelectedExpenseCategoryToPayError(errors.category);
         } else {
             resetAllErrorsAndStates();
         }
@@ -57,7 +58,13 @@ export default function MemberExpenseTransaction() {
     };
 
     const handlePayment = () => {
-        console.log('here')
+        Inertia.post('/user/plan/fund-transfer', {
+            selectedUserEmail: selectedUserToPay.email,
+            category: selectedExpenseCategoryToPay.name,
+            amount: amountToPay,
+            password: userPassword,
+            planId: planId
+        });
     }
 
     return (

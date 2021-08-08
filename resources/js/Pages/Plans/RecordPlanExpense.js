@@ -350,7 +350,7 @@ export default function RecordPlanExpense({ planId }) {
                     </Button>
                 </div>
             </form>
-            <MemberExpenseTransaction/>
+            <MemberExpenseTransaction planId={planId}/>
         </div>
     )
 }
