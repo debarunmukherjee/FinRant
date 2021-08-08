@@ -60,7 +60,7 @@ export default function ViewPlan(props) {
                                 },
                                 {
                                     label: 'Plan Activity',
-                                    contents: (<PlanActivity id={planDetails.id}/>),
+                                    contents: (<PlanActivity planId={planDetails.id}/>),
                                 },
                                 {
                                     label: 'Record Expense',
