@@ -49,7 +49,8 @@ class Plan extends Model
     }
 
     /**
-     * Returns whether a user has access to record an expense or be involved in a transaction in a plan.
+     * Returns whether a user has access to record an expense or be involved in a transaction in a plan.<br/>
+     * It can also be used wherever we want to check if a user is a creator or member of a plan.
      * @param $userId
      * @param $planId
      * @return bool
@@ -57,5 +58,21 @@ class Plan extends Model
     public static function userHasPlanExpenseAccess($userId, $planId): bool
     {
         return (self::isUserPlanCreator($planId, $userId) || PlanMember::isUserPlanMember($planId, $userId));
+    }
+
+    /**
+     * Returns whether 2 users can exchange funds in a given plan.
+     * @param $srcUserId
+     * @param $destUserId
+     * @param $planId
+     * @return bool
+     */
+    public static function usersCanExchangeFundsInPlan($srcUserId, $destUserId, $planId): bool
+    {
+        return (
+            $srcUserId !== $destUserId &&
+            self::userHasPlanExpenseAccess($srcUserId, $planId) &&
+            self::userHasPlanExpenseAccess($destUserId, $planId)
+        );
     }
 }

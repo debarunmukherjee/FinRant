@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ExpendCategory;
+use App\Models\Expense;
 use App\Models\PendingPlanDebt;
 use App\Models\Plan;
 use App\Models\PlanDebtTransaction;
@@ -73,6 +75,59 @@ class TransactionController extends Controller
 
         if ($result) {
             return Redirect::back()->with('success', 'Your debt is cleared!');
+        }
+        return Redirect::back()->with('error', 'Some error occurred');
+    }
+
+    public function interPlanFundTransfer(Request $request): RedirectResponse
+    {
+        $userId = (int)Auth::id();
+        $planId = (int)$request->post('planId');
+        $destUserId = User::getUserIdFromEmail($request->post('selectedUserEmail'));
+        $amount = $request->post('amount');
+        $categoryId = ExpendCategory::getCategoryIdFromName($request->post('category'), $userId);
+        $request->validate([
+            'planId' => ['required', 'numeric', 'exists:plans,id'],
+            'selectedUserEmail' => [
+                'required',
+                'email',
+                function ($attribute, $value, $fail) use($userId, $planId) {
+                    $destUserId = User::getUserIdFromEmail($value);
+                    if (!Plan::usersCanExchangeFundsInPlan($userId, $destUserId, $planId)) {
+                        $fail('You cannot pay this user.');
+                    }
+                }
+            ],
+            'category' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) use($categoryId) {
+                    if (empty($categoryId)) {
+                        $fail('Invalid Category.');
+                    }
+                }
+            ],
+            'amount' => ['required', 'numeric', 'gt:0'],
+            'password' => ['required', 'current-password']
+        ]);
+
+        // todo: At this point the user should be redirected to the payment gateway to transfer money to the other user.
+
+        // On successful transfer, we will record the expense and transaction - the stuff being done below.
+
+        $result = DB::transaction(
+            function () use ($planId, $userId, $destUserId, $amount, $categoryId) {
+                $transactionId = Transaction::recordUserTransaction($userId, $destUserId, $amount);
+                if (empty($transactionId)) {
+                    return false;
+                }
+
+                return Expense::createUnsharedExpenseForUser($userId, $planId, $categoryId, $amount, $transactionId);
+            }
+        );
+
+        if ($result) {
+            return Redirect::back()->with('success', 'Your transaction is successful and expense is recorded!');
         }
         return Redirect::back()->with('error', 'Some error occurred');
     }

@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/invite/reject', [InviteUserController::class, 'rejectInvite']);
     Route::post('/expense/add', [ExpenseController::class, 'createExpense']);
     Route::post('/settle-dues', [TransactionController::class, 'clearDebt']);
+    Route::post('/user/plan/fund-transfer', [TransactionController::class, 'interPlanFundTransfer']);
 });
 
 require __DIR__.'/auth.php';
