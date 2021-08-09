@@ -9,7 +9,7 @@ import {InertiaLink} from "@inertiajs/inertia-react";
 
 const useStyles = makeStyles({
     root: {
-        minWidth: 270,
+        width: 270,
         margin: 10,
         border: "5px solid rgba(219, 234, 254, 1)",
     },
