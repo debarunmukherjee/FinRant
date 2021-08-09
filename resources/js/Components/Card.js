@@ -43,7 +43,7 @@ export default function CardWithNavButton({title, subTitle, buttonText, body, na
             <CardContent>
                 <Typography className={classes.title} variant="h5" component="h2">
                     <div className="flex">
-                        <p>{title}</p>
+                        <p className="max-w-sm break-words pr-5">{title}</p>
                         <p className="ml-auto">
                             <span className={`inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-${titleBadgeColor}-100 bg-${titleBadgeColor}-600 rounded-full`}>
                                 {titleBadgeText}
