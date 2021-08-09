@@ -67,7 +67,7 @@ export default function PlanExpenses({ planId }) {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="text-sm text-gray-900">
-                                    <span className={`inline-flex items-center justify-center px-2 py-1 text-sm font-bold leading-none text-${userPendingTransaction.action === 'receive' ? 'green' : 'red'}-100 bg-${userPendingTransaction.action === 'receive' ? 'green' : 'red'}-600 rounded-full`}>
+                                    <span className={`inline-flex items-center justify-center px-2 py-1 text-sm font-bold leading-none ${userPendingTransaction.action === 'receive' ? 'text-green-100' : 'text-red-100'} ${userPendingTransaction.action === 'receive' ? 'bg-green-600' : 'bg-red-600'} rounded-full`}>
                                         {userPendingTransaction.action}
                                     </span>
                                 </div>

@@ -45,7 +45,7 @@ export default function CardWithNavButton({title, subTitle, buttonText, body, na
                     <div className="flex">
                         <p className="max-w-sm break-words pr-5">{title}</p>
                         <p className="ml-auto">
-                            <span className={`inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-${titleBadgeColor}-100 bg-${titleBadgeColor}-600 rounded-full`}>
+                            <span className={`inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none ${titleBadgeColor === 'green' ? 'text-green-100 bg-green-600' : 'text-purple-100 bg-purple-600'} rounded-full`}>
                                 {titleBadgeText}
                             </span>
                         </p>
