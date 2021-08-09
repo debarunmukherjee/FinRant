@@ -58,7 +58,7 @@ class User extends Authenticatable
     {
         $result = self::join('user_information', 'user_information.user_id', '=', 'users.id')
                     ->where('users.id', $userId)
-                    ->get([DB::raw("concat(first_name, ' ', last_name) as full_name"), 'email', 'profile_picture as avatar'])
+                    ->get([DB::raw("concat(first_name, ' ', ifnull(last_name, '')) as full_name"), 'email', 'profile_picture as avatar'])
                     ->toArray();
         return empty($result) ? [] : $result[0];
     }
