@@ -12,6 +12,8 @@ const useStyles = makeStyles({
         width: 270,
         margin: 10,
         border: "5px solid rgba(219, 234, 254, 1)",
+        display: 'flex',
+        flexDirection: 'column'
     },
     bullet: {
         display: 'inline-block',
@@ -57,7 +59,7 @@ export default function CardWithNavButton({title, subTitle, buttonText, body, na
                     {body}
                 </Typography>
             </CardContent>
-            <CardActions>
+            <CardActions className="mt-auto">
                 <InertiaLink href={navLink}>
                     <Button className="hover:bg-blue-500 bg-blue-400">{buttonText}</Button>
                 </InertiaLink>
