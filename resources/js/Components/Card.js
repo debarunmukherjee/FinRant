@@ -28,7 +28,8 @@ const useStyles = makeStyles({
         marginBottom: 12,
     },
     body: {
-        marginTop: '2rem'
+        marginTop: '2rem',
+        overflowWrap: "break-word"
     }
 });
 
