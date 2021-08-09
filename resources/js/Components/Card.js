@@ -9,9 +9,11 @@ import {InertiaLink} from "@inertiajs/inertia-react";
 
 const useStyles = makeStyles({
     root: {
-        minWidth: 270,
+        width: 270,
         margin: 10,
         border: "5px solid rgba(219, 234, 254, 1)",
+        display: 'flex',
+        flexDirection: 'column'
     },
     bullet: {
         display: 'inline-block',
@@ -28,7 +30,8 @@ const useStyles = makeStyles({
         marginBottom: 12,
     },
     body: {
-        marginTop: '2rem'
+        marginTop: '2rem',
+        overflowWrap: "break-word"
     }
 });
 
@@ -40,7 +43,7 @@ export default function CardWithNavButton({title, subTitle, buttonText, body, na
             <CardContent>
                 <Typography className={classes.title} variant="h5" component="h2">
                     <div className="flex">
-                        <p>{title}</p>
+                        <p className="max-w-sm break-words pr-5">{title}</p>
                         <p className="ml-auto">
                             <span className={`inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-${titleBadgeColor}-100 bg-${titleBadgeColor}-600 rounded-full`}>
                                 {titleBadgeText}
@@ -56,7 +59,7 @@ export default function CardWithNavButton({title, subTitle, buttonText, body, na
                     {body}
                 </Typography>
             </CardContent>
-            <CardActions>
+            <CardActions className="mt-auto">
                 <InertiaLink href={navLink}>
                     <Button className="hover:bg-blue-500 bg-blue-400">{buttonText}</Button>
                 </InertiaLink>
