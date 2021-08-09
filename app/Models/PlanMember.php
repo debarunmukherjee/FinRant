@@ -54,7 +54,7 @@ class PlanMember extends Model
         $records = self::join('users', 'users.id', '=', 'plan_members.user_id')
                     ->join('user_information', 'user_information.user_id', '=', 'plan_members.user_id')
                     ->where('plan_id', $planId)
-                    ->get([DB::raw("concat(users.first_name, ' ', users.last_name) as full_name"), 'users.id as userId', 'users.email', 'user_information.profile_picture as avatar', 'user_information.country', DB::raw("'member' as role")])
+                    ->get([DB::raw("concat(users.first_name, ' ', ifnull(users.last_name, '')) as full_name"), 'users.id as userId', 'users.email', 'user_information.profile_picture as avatar', 'user_information.country', DB::raw("'member' as role")])
                     ->toArray();
         $result = [];
         foreach ($records as $record) {
