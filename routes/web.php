@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InviteUserController;
 use App\Http\Controllers\PlanActivityController;
@@ -33,9 +34,7 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'viewDashboard'])->name('dashboard');
     Route::get('/plan/{planId}', [PlanController::class, 'getPlan'])->name('plan.view');
     Route::get('/plans', [PlanController::class, 'index'])->name('plans');
     Route::post('/create-plan', [PlanController::class, 'createPlan']);
