@@ -63,7 +63,7 @@ export default function Dashboard(props) {
                                                 type="text"
                                                 className="w-auto focus:ring-indigo-500 focus:border-indigo-500 flex-1 w-auto inline rounded sm:text-sm border-gray-300"
                                                 placeholder="Last Name"
-                                                value={userLastName}
+                                                value={userLastName ? userLastName : ''}
                                                 onChange={(e) => {setUserLastName(e.target.value)}}
                                             />
                                             {errors.lastName ? <p className="text-xs text-red-500">{errors.lastName}</p> : ''}
