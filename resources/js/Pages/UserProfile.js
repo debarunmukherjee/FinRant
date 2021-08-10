@@ -89,15 +89,9 @@ export default function Dashboard(props) {
                                             />
                                             {errors.country ? <p className="text-xs text-red-500">{errors.country}</p> : ''}
                                         </div>
-                                        <button
-                                            type="submit"
-                                            className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm`}
-                                        >
-                                            Save
-                                        </button>
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
-                                        <div className="flex flex-col justify-center">
+                                        <div className="flex flex-col justify-center mt-6">
                                             <ImageUpload
                                                 previewUrl={userAvatarUrl}
                                                 setPreviewUrl={setUserAvatarUrl}
@@ -106,6 +100,14 @@ export default function Dashboard(props) {
                                             />
                                             {errors.avatar ? <p className="text-xs text-red-500 text-center mt-3">{errors.avatar}</p> : ''}
                                         </div>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <button
+                                            type="submit"
+                                            className={`mt-5 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:w-auto sm:text-sm`}
+                                        >
+                                            Save
+                                        </button>
                                     </Grid>
                                 </Grid>
                             </form>
