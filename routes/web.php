@@ -52,6 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/settle-dues', [TransactionController::class, 'clearDebt']);
     Route::post('/user/plan/fund-transfer', [TransactionController::class, 'interPlanFundTransfer']);
     Route::get('/plan-activities', [PlanActivityController::class, 'getActivities']);
+    Route::get('/get/total-expense', [ExpenseController::class, 'getTotalUserExpenseForPlan']);
 });
 
 require __DIR__.'/auth.php';

@@ -178,4 +178,12 @@ class Expense extends Model
 
         return $result;
     }
+
+    public static function getTotalExpenseOfUserInPlan($planId, $userId)
+    {
+        return self::where([
+            ['user_id', $userId],
+            ['plan_id', $planId],
+        ])->sum('amount');
+    }
 }

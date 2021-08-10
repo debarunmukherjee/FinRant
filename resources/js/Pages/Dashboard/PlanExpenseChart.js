@@ -5,6 +5,7 @@ import {Alert} from "@material-ui/lab";
 import AutocompleteSelect from "@/Components/AutocompleteSelect";
 import Table from "@/Components/Table";
 import Button from "@/Components/Button";
+import API from "@/Utils/API";
 
 export default function PlanExpenseChart() {
     const { createdPlans, memberPlans } = usePage().props;
@@ -36,13 +37,21 @@ export default function PlanExpenseChart() {
         { name: 'Group E', value: 278 },
         { name: 'Group F', value: 189 },
     ];
+
     const onClickDelete = (planId) => {
         setChosenPlansForViewing(chosenPlansForViewing.filter((plan) => plan.id !== planId));
     };
+
+    const fetchTotalExpense = async (planId) => {
+        const res = await API.get(`/get/total-expense?planId=${planId}`);
+        console.log(res.data);
+    }
+
     const handleAddChosenPlan = () => {
         if (chosenPlansForViewing.filter((plan) => plan.id === selectedPlan.id).length > 0) {
             setSelectedPlanError('Plan already selected.');
         } else {
+            fetchTotalExpense(selectedPlan.id);
             setChosenPlansForViewing([
                 ...chosenPlansForViewing,
                 selectedPlan

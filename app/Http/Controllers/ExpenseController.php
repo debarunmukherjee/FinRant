@@ -10,6 +10,7 @@ use App\Models\PlanDebt;
 use App\Models\PlanMember;
 use App\Models\SharedExpenseDetail;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -146,5 +147,26 @@ class ExpenseController extends Controller
             return Redirect::back()->with('success', 'Your expense is recorded!');
         }
         return Redirect::back()->with('error', 'Could not save expense');
+    }
+
+    public function getTotalUserExpenseForPlan(Request $request): JsonResponse
+    {
+        $userId = Auth::id();
+        $planId = $request->get('planId');
+
+        $request->validate([
+            'planId' => [
+                'required',
+                'numeric',
+                'exists:plans,id',
+                function ($attribute, $value, $fail) use ($userId) {
+                    if (!Plan::userHasPlanExpenseAccess($userId, $value)) {
+                        $fail('Invalid Request');
+                    }
+                }
+            ]
+        ]);
+
+        return response()->json(['status' => 'success', 'amount' => Expense::getTotalExpenseOfUserInPlan($planId, $userId)]);
     }
 }
