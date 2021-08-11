@@ -110,4 +110,23 @@ class PendingPlanDebt extends Model
             }
         );
     }
+
+    /**
+     * Returns the total pending amount of a user across all the plans.
+     * @param $userId
+     * @return float
+     */
+    public static function getTotalPendingDebtAcrossAllPlans($userId): float
+    {
+        $records = self::where('src_user_id', $userId)->get(['amount', 'action'])->toArray();
+        $totalPending = 0;
+        foreach ($records as $record) {
+            if ($record['action'] === 'receive') {
+                $totalPending -= (float)$record['amount'];
+            } else {
+                $totalPending += (float)$record['amount'];
+            }
+        }
+        return $totalPending;
+    }
 }
