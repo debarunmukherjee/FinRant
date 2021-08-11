@@ -4,6 +4,8 @@ import {Grid} from "@material-ui/core";
 import AutocompleteSelect from "@/Components/AutocompleteSelect";
 import ImageUpload from "@/Components/ImageUpload";
 import {Inertia} from "@inertiajs/inertia";
+import {getCurrentMonth} from "@/Utils/Common";
+import NumberInput from "@/Components/NumberInput";
 
 export default function Dashboard(props) {
     const { userDetails, countryList, errors } = props;
@@ -13,6 +15,7 @@ export default function Dashboard(props) {
     const [userCountry, setUserCountry] = useState('');
     const [userImageFile, setUserImageFile] = useState(null);
     const [userAvatarUrl, setUserAvatarUrl] = useState('');
+    const [monthlyBudget, setMonthlyBudget] = useState(0);
 
     useEffect(() => {
         setUserFirstName(userDetails.firstName);
@@ -20,6 +23,7 @@ export default function Dashboard(props) {
         setUserEmail(userDetails.email);
         setUserCountry(userDetails.country);
         setUserAvatarUrl(userDetails.avatar);
+        setMonthlyBudget(userDetails.monthlyBudget);
     }, []);
 
     const handleSubmit = (e) => {
@@ -29,7 +33,8 @@ export default function Dashboard(props) {
             lastName: userLastName,
             email: userEmail,
             avatar: userImageFile,
-            country: userCountry
+            country: userCountry,
+            monthlyBudget: monthlyBudget
         })
     }
 
@@ -81,13 +86,25 @@ export default function Dashboard(props) {
                                         </div>
                                         <div className="mb-8 flex flex-col">
                                             <p className="mb-2 font-medium">Country:</p>
-                                            <AutocompleteSelect
-                                                itemsList={countryList}
-                                                selectedValue={userDetails.country}
-                                                setSelectedValue={setUserCountry}
-                                                placeholder="Search Country"
-                                            />
+                                            {countryList.length > 0 && userCountry ? (
+                                                <AutocompleteSelect
+                                                    itemsList={countryList}
+                                                    selectedValue={userCountry}
+                                                    setSelectedValue={setUserCountry}
+                                                    placeholder="Search Country"
+                                                />
+                                            ) : ''}
                                             {errors.country ? <p className="text-xs text-red-500">{errors.country}</p> : ''}
+                                        </div>
+                                        <div className="mb-8 flex flex-col">
+                                            <label htmlFor="month_budget" className="mb-2 font-medium">Budget for the month of <b>{getCurrentMonth()}</b> ({userDetails.currency})</label>
+                                            <NumberInput
+                                                elementId="month_budget"
+                                                value={monthlyBudget}
+                                                setValue={setMonthlyBudget}
+                                                placeholder="Enter amount"
+                                            />
+                                            {errors.monthlyBudget ? <p className="text-xs text-red-500">{errors.monthlyBudget}</p> : ''}
                                         </div>
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
