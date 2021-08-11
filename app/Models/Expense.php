@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Expense extends Model
 {
@@ -177,5 +179,56 @@ class Expense extends Model
         }
 
         return $result;
+    }
+
+    /**
+     * Returns the total expense of a user in a plan.
+     * @param $planId
+     * @param $userId
+     * @return float
+     */
+    public static function getTotalExpenseOfUserInPlan($planId, $userId): float
+    {
+        return self::where([
+            ['user_id', $userId],
+            ['plan_id', $planId],
+        ])->sum('amount');
+    }
+
+    /**
+     * Returns an array of the month wise total expenses of the user, for the last 5 months.
+     * @param $userId
+     * @return array
+     */
+    public static function getUserExpenseDataForLastFiveMonths($userId): array
+    {
+        $current = Carbon::now();
+        $result = [];
+        $count = 1;
+        while ($count <= 5) {
+            $month = $current->month;
+            $year = $current->year;
+            $fromDate = $current->startOfMonth()->toDateString();
+            $tillDate = $current->endOfMonth()->toDateString();
+            $current->startOfMonth();
+            $totalAmount = self::where([
+                ['user_id', $userId],
+            ])->whereBetween(DB::raw('date(created_at)'), [$fromDate, $tillDate])->sum('amount');
+            $result[] = ['year' => $year, 'month' => $month, 'amount' => $totalAmount];
+            $current->subMonth();
+            $count++;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns the sum total of all the expenses made by a user.
+     * @param $userId
+     * @return float
+     */
+    public static function getTotalExpenseOfUserAcrossAllPlans($userId): float
+    {
+        return self::where('user_id', $userId)->sum('amount');
     }
 }

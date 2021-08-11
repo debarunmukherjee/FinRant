@@ -18,11 +18,19 @@ module.exports = {
                 '1/2': '50%',
                 '3/4': '75%',
             },
+            minWidth: {
+                '60': '15rem',
+                '64': '16rem',
+                '72': '18rem',
+                '80': '20rem',
+                '96': '24rem',
+            },
             height: {
                 '60-vh': '60vh'
             },
             screens: {
-                'xs': '300px'
+                'xs': '300px',
+                'screen-998': '998px'
             }
         },
     },
