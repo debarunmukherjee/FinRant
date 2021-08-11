@@ -6,6 +6,7 @@ import AutocompleteSelect from "@/Components/AutocompleteSelect";
 import Table from "@/Components/Table";
 import Button from "@/Components/Button";
 import API from "@/Utils/API";
+import {Grid} from "@material-ui/core";
 
 export default function PlanExpenseChart() {
     const { createdPlans, memberPlans } = usePage().props;
@@ -69,35 +70,43 @@ export default function PlanExpenseChart() {
             setSelectedPlanError('');
         }
     };
-    return (
-        <div className="grid grid-flow-row sm:grid-flow-col sm:grid-cols-2 gap-4">
-            <div className="overflow-x-scroll">
-                <div className="w-full h-64 p-3 min-w-72">
-                    <h2 className="font-semibold mb-5 text-xl text-center sm:text-2xl">Expense Chart</h2>
-                    {planExpenditures.length === 0 || planExpenditures.reduce((sum, {value}) => sum+Number(value), 0) === 0 ? (
-                        <Alert className="mt-3" severity="info">No expenses have been made for the selected plans.</Alert>
-                    ) : (
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    dataKey="value"
-                                    isAnimationActive={false}
-                                    data={planExpenditures}
-                                    fill="#8884d8"
-                                    label
-                                >
-                                    {planExpenditures.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip filterNull={false} />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    )}
 
+    const canDisplayChart = () => {
+        return !(planExpenditures.length === 0 || planExpenditures.reduce((sum, {value}) => sum+Number(value), 0) === 0);
+    }
+    return (
+        <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+                <div className="p-3">
+                    <h2 className="font-semibold mb-5 text-xl text-center sm:text-2xl">Expense Chart</h2>
+                    <div className="overflow-x-scroll">
+                        <div className={`w-full ${canDisplayChart() ? 'h-56 sm:h-64 min-w-96' : ''}`}>
+                            {!canDisplayChart() ? (
+                                <Alert className="mt-3" severity="info">No expenses have been made for the selected plans.</Alert>
+                            ) : (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            dataKey="value"
+                                            isAnimationActive={true}
+                                            data={planExpenditures}
+                                            fill="#8884d8"
+                                            label
+                                        >
+                                            {planExpenditures.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip filterNull={false} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            )}
+
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div>
+            </Grid>
+            <Grid item xs={12} sm={6}>
                 <div className="p-3">
                     <h2 className="font-semibold mb-5 text-xl text-center sm:text-2xl">Plan Expense Stats</h2>
                     {plansList.length > 0 && selectedPlan ? (
@@ -157,7 +166,7 @@ export default function PlanExpenseChart() {
 
                     ) : (<Alert className="mt-3" severity="info">You don't have any plans to get expense stats.</Alert>)}
                 </div>
-            </div>
-        </div>
+            </Grid>
+        </Grid>
     );
 }
