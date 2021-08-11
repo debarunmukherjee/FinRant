@@ -29,7 +29,8 @@ module.exports = {
                 '60-vh': '60vh'
             },
             screens: {
-                'xs': '300px'
+                'xs': '300px',
+                'screen-998': '998px'
             }
         },
     },
