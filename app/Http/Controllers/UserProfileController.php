@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\UserInformation;
+use App\Models\UserMonthlyBudget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -31,7 +33,9 @@ class UserProfileController extends Controller
                 'lastName' => $lastName,
                 'email' => $email,
                 'country' => $country,
-                'avatar' => $avatar
+                'avatar' => $avatar,
+                'currency' => UserInformation::getUserCurrencyCode($userId),
+                'monthlyBudget' => UserMonthlyBudget::getUserBudgetForCurrentMonth($userId)
             ],
             'countryList' => Countries::all()->pluck('name.common')->toArray()
         ]);
@@ -45,26 +49,31 @@ class UserProfileController extends Controller
             'country' => ['required', Rule::in(Countries::all()->pluck('name.common')->toArray())],
             'email' => ['email', 'required', Rule::unique('users')->ignore(Auth::id())],
             'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+            'monthlyBudget' => ['required', 'numeric', 'gt:0']
         ]);
 
-        $user = User::where('id', Auth::id())->first();
-        $user->first_name = $request->post('firstName');
-        $user->last_name = $request->post('lastName');
-        $user->email = $request->post('email');
-        $result = $user->save();
+        $result = DB::transaction(function () use ($request) {
+            $user = User::where('id', Auth::id())->first();
+            $user->first_name = $request->post('firstName');
+            $user->last_name = $request->post('lastName');
+            $user->email = $request->post('email');
+            $result = $user->save();
 
-        if ($request->hasFile('avatar')) {
-            $image = $request->file('avatar');
-            $fileName = bin2hex(random_bytes(16)) . '.' . $image->getClientOriginalExtension();
-            Storage::disk('public')->put("images/$fileName", file_get_contents($image->getRealPath()));
-        }
+            if ($request->hasFile('avatar')) {
+                $image = $request->file('avatar');
+                $fileName = bin2hex(random_bytes(16)) . '.' . $image->getClientOriginalExtension();
+                Storage::disk('public')->put("images/$fileName", file_get_contents($image->getRealPath()));
+            }
 
-        $userInformation = UserInformation::where('user_id', Auth::id())->first();
-        $userInformation->country = $request->post('country');
-        if (!empty($fileName)) {
-            $userInformation->profile_picture = $fileName;
-        }
-        $result = $result && $userInformation->save();
+            $userInformation = UserInformation::where('user_id', Auth::id())->first();
+            $userInformation->country = $request->post('country');
+            if (!empty($fileName)) {
+                $userInformation->profile_picture = $fileName;
+            }
+            $result = $result && $userInformation->save();
+            return $result && UserMonthlyBudget::saveUserBudgetForCurrentMonth(Auth::id(), (float)$request->post('monthlyBudget'));
+        });
+
 
         if (!$result) {
             return Redirect::back()->with('error', 'Could not save user information.');
