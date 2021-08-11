@@ -1,5 +1,5 @@
 import Authenticated from '@/Layouts/Authenticated';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Button from "@/Components/Button";
 import Modal from "@/Components/Modal";
 import {Inertia} from "@inertiajs/inertia";
@@ -12,7 +12,13 @@ export default function Plans(props) {
     const [newPlanName, setNewPlanName] = useState('');
     const [newPlanDescription, setNewPlanDescription] = useState('');
 
-    const { createdPlans, memberPlans } = props;
+    const { createdPlans, memberPlans, errors } = props;
+
+    useEffect(() => {
+        if (!(errors.name || errors.description)) {
+            setOpenCreatePlanForm(false);
+        }
+    },[errors]);
 
     const handleNewPlanNameChange = (e) => {
         setNewPlanName(e.target.value);
@@ -25,6 +31,7 @@ export default function Plans(props) {
     const openCreatePlanFormModal = () => {
         setOpenCreatePlanForm(true);
     }
+
     const handleCreatePlanClick = () => {
         Inertia.post(
             '/create-plan',
@@ -33,8 +40,8 @@ export default function Plans(props) {
                 description: newPlanDescription,
             }
         );
-        setOpenCreatePlanForm(false);
     }
+
     return (
         <Authenticated
             auth={props.auth}
@@ -104,6 +111,7 @@ export default function Plans(props) {
                     <p className="mt-2 text-sm text-gray-500">
                         A short and sweet name for your plan.
                     </p>
+                    {errors.name ? (<p className="text-red-500 text-xs mt-1">{errors.name}</p>) : ''}
                 </div>
                 <div className="mt-2">
                     <label htmlFor="plan_description" className="block text-sm font-medium text-gray-700">
@@ -123,6 +131,7 @@ export default function Plans(props) {
                     <p className="mt-2 text-sm text-gray-500">
                         A brief description about your plan.
                     </p>
+                    {errors.description ? (<p className="text-red-500 text-xs mt-1">{errors.description}</p>) : ''}
                 </div>
             </Modal>
         </Authenticated>
