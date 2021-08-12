@@ -5,10 +5,10 @@ import {Inertia} from "@inertiajs/inertia";
 import {usePage} from "@inertiajs/inertia-react";
 import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import Modal from "@/Components/Modal";
-import Select from "@/Components/Select";
 import {Alert} from "@material-ui/lab";
 import BudgetList from "@/Pages/Plans/BudgetList";
 import Table from "@/Components/Table";
+import AutocompleteSelect from "@/Components/AutocompleteSelect";
 
 export default function PlanDetails({ id }) {
     const { errors, categoryList, budgetList } = usePage().props;
@@ -136,13 +136,15 @@ export default function PlanDetails({ id }) {
                         Category
                     </label>
                     <div className="mt-1">
-                        <Select
-                            noOptionText="Please create a category first"
-                            options={categoryList}
-                            label="name"
-                            selected={newBudgetCategory}
-                            setSelected={setNewBudgetCategory}
-                        />
+                        {categoryList.length > 0 && newBudgetCategory ? (
+                            <AutocompleteSelect
+                                itemsList={categoryList}
+                                itemLabelKey="name"
+                                selectedValue={newBudgetCategory}
+                                setSelectedValue={setNewBudgetCategory}
+                                placeholder="Search Category"
+                            />
+                        ) : (<Alert severity="info" className="max-w-full sm:max-w-3/4">Please create a category first!</Alert>)}
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
                         Select the expense category for which you want to set a budget for.
