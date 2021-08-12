@@ -17,6 +17,8 @@ export default function Plans(props) {
     useEffect(() => {
         if (!(errors.name || errors.description)) {
             setOpenCreatePlanForm(false);
+            setNewPlanName('');
+            setNewPlanDescription('');
         }
     },[errors]);
 
