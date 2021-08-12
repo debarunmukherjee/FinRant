@@ -25,7 +25,8 @@ class DashboardController extends Controller
                 'lastFiveMonthExpenses' => Expense::getUserExpenseDataForLastFiveMonths(Auth::id()),
                 'lastFiveMonthBudget' => UserMonthlyBudget::getUserBudgetDataForLastFiveMonths(Auth::id()),
                 'totalSavings' => $savings,
-                'totalPending' => PendingPlanDebt::getTotalPendingDebtAcrossAllPlans(Auth::id())
+                'totalPending' => PendingPlanDebt::getTotalPendingDebtAcrossAllPlans(Auth::id()),
+                'hasUserSetBudgetForCurrentMonth' => UserMonthlyBudget::hasUserSetBudgetForCurrentMonth(Auth::id())
             ]
         );
     }
