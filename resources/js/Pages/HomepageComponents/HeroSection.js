@@ -38,7 +38,9 @@ function HeroHome() {
                                     </InertiaLink>
                                 </div>
                                 <div>
-                                    <Button className="text-white bg-gray-900 hover:bg-gray-800 w-full sm:w-auto sm:ml-4" href="#0">Learn more</Button>
+                                    <a href="#features">
+                                        <Button className="text-white bg-gray-900 hover:bg-gray-800 w-full sm:w-auto sm:ml-4">Learn more</Button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -65,7 +67,6 @@ function HeroHome() {
                                 </iframe>
                             </div>
                         </VideoModal>
-
                     </div>
                 </div>
             </div>

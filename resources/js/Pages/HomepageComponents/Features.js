@@ -18,7 +18,7 @@ function Features() {
     }, [tab])
 
     return (
-        <section className="relative">
+        <section className="relative" id="features">
             <div className="absolute inset-0 bg-gray-100 pointer-events-none mb-16" aria-hidden="true"/>
             <div className="absolute left-0 right-0 m-auto w-px p-px h-20 bg-gray-200 transform -translate-y-1/2"/>
 
