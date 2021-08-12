@@ -26,7 +26,8 @@ module.exports = {
                 '96': '24rem',
             },
             height: {
-                '60-vh': '60vh'
+                '60-vh': '60vh',
+                '70-vh': '70vh'
             },
             screens: {
                 'xs': '300px',
