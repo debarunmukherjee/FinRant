@@ -130,8 +130,8 @@ function Features() {
                                     leaveStart="opacity-100 translate-y-0"
                                     leaveEnd="opacity-0 -translate-y-16"
                                 >
-                                    <div className="relative inline-flex flex-col shadow-xl">
-                                        <img className="md:max-w-none mt-0 sm:mt-60 w-full max-h-32-rem transform animate-float" src="/storage/images/dashboard.png" alt="Finance Dashboard" />
+                                    <div className="relative inline-flex flex-col shadow-xl mt-0 sm:mt-40">
+                                        <img className="md:max-w-none w-full max-h-32-rem transform animate-float" src="/storage/images/dashboard.png" alt="Finance Dashboard" />
                                     </div>
                                 </Transition>
                             </div>

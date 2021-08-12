@@ -58,7 +58,7 @@ function FeaturesBlocks() {
                                 </svg>
                             </p>
                             <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">Secure Payment</h4>
-                            <p className="text-gray-600 text-center">Settle your dues or transfer money to other members direct from our app with our secured payment gateway.</p>
+                            <p className="text-gray-600 text-center">Settle your dues or transfer money to other members directly from our app with our secured payment gateway.</p>
                         </div>
                         <div className="relative flex flex-col items-center p-6 bg-white rounded shadow-xl self-stretch">
                             <p className="p-3 rounded-full bg-blue-600 text-white">
