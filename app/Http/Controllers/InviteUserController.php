@@ -67,29 +67,14 @@ class InviteUserController extends Controller
 
     public function viewInvites(): Response
     {
-        $invitesData = PlanUserInvite::select('first_name', 'last_name', 'email', 'plans.name as plan_name')
-                                        ->join('users', 'users.id', '=', 'plan_user_invites.sent_by')
-                                        ->join('plans', 'plans.id', '=', 'plan_user_invites.plan_id')
-                                        ->where([
-                                            ['sent_to', Auth::id()],
-                                            ['has_accepted', 0],
-                                            ['is_rejected', 0],
-                                        ])
-                                        ->get();
-        $invitesList = [];
-        foreach ($invitesData as $invite) {
-            $res_item['planName'] = $invite->plan_name;
-            $res_item['name'] = $invite->first_name . ' ' . $invite->last_name;
-            $res_item['email'] = $invite->email;
-            $invitesList[] = $res_item;
-        }
-        return Inertia::render('ViewInvites', ['invitesList' => $invitesList]);
+
+        return Inertia::render('ViewInvites', ['invitesList' => PlanUserInvite::getAllInvitesForUser(Auth::id())]);
     }
 
     private function performInviteActionValidations(Request $request, $userId, $planId, $inviterUserId): void
     {
         $request->validate([
-            'planName' => ['required', 'exists:plans,name'],
+            'planId' => ['required', 'exists:plans,id'],
             'email' => [
                 'email',
                 'required',
@@ -113,7 +98,7 @@ class InviteUserController extends Controller
     {
         $userId = Auth::id();
         $inviterUserId = User::getUserIdFromEmail($request->post('email'));
-        $planId = Plan::getPlanIdFromName($request->post('planName'));
+        $planId = $request->post('planId');
 
         $this->performInviteActionValidations($request, $userId, $planId, $inviterUserId);
 
@@ -127,7 +112,7 @@ class InviteUserController extends Controller
     {
         $userId = Auth::id();
         $inviterUserId = User::getUserIdFromEmail($request->post('email'));
-        $planId = Plan::getPlanIdFromName($request->post('planName'));
+        $planId = $request->post('planId');
 
         $this->performInviteActionValidations($request, $userId, $planId, $inviterUserId);
 

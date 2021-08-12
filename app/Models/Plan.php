@@ -16,12 +16,6 @@ class Plan extends Model
         'created_by'
     ];
 
-    public static function getPlanIdFromName($name): int
-    {
-        $result = self::select('id')->where('name', $name)->first();
-        return empty($result) ? 0 : (int)$result->id;
-    }
-
     public static function getPlanDetails($planId)
     {
         return self::where('id', $planId)->first();

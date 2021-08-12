@@ -14,13 +14,13 @@ export default function ViewInvites() {
 
     const onClickAccept = (index) => {
         Inertia.put('/invite/accept', {
-            planName: invitesList[index].planName,
+            planId: invitesList[index].planId,
             email: invitesList[index].email
         })
     }
     const sendRejectRequest = () => {
         Inertia.put('/invite/reject', {
-            planName: invitesList[rejectedInviteId].planName,
+            planId: invitesList[rejectedInviteId].planId,
             email: invitesList[rejectedInviteId].email
         })
     }

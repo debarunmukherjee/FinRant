@@ -60,4 +60,35 @@ class PlanUserInvite extends Model
         $invite->is_rejected = 1;
         return $invite->save();
     }
+
+    /**
+     * Returns an array of all the pending invites for a user.<br/>Return array format:<br/>
+     * ```
+     * ['planName' => planName, 'name' => inviterUserFullName, 'email' => inviterUserEmail, 'planId' => invitedPlanId]
+     * ```
+     * @param $userId
+     * @return array
+     */
+    public static function getAllInvitesForUser($userId): array
+    {
+        $invitesData = self::select('first_name', 'last_name', 'email', 'plans.name as plan_name', 'plans.id as plan_id')
+            ->join('users', 'users.id', '=', 'plan_user_invites.sent_by')
+            ->join('plans', 'plans.id', '=', 'plan_user_invites.plan_id')
+            ->where([
+                ['sent_to', $userId],
+                ['has_accepted', 0],
+                ['is_rejected', 0],
+            ])
+            ->get();
+        $invitesList = [];
+        foreach ($invitesData as $invite) {
+            $res_item['planName'] = $invite->plan_name;
+            $res_item['name'] = $invite->first_name . ' ' . $invite->last_name;
+            $res_item['email'] = $invite->email;
+            $res_item['planId'] = $invite->plan_id;
+            $invitesList[] = $res_item;
+        }
+
+        return $invitesList;
+    }
 }
