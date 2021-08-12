@@ -25,12 +25,17 @@ module.exports = {
                 '80': '20rem',
                 '96': '24rem',
             },
+            maxHeight: {
+                '32-rem': '32rem'
+            },
             height: {
-                '60-vh': '60vh'
+                '60-vh': '60vh',
+                '70-vh': '70vh'
             },
             screens: {
                 'xs': '300px',
-                'screen-998': '998px'
+                'screen-998': '998px',
+                'small-mobile': '354px'
             }
         },
     },
