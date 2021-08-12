@@ -30,11 +30,7 @@ function Features() {
                             We provide every user feasibility to analyse their expenses in granular manner, by recording every expense in their own categories.
                         </p>
                     </div>
-
-                    {/* Section content */}
                     <div className="md:grid md:grid-cols-12 md:gap-6">
-
-                        {/* Content */}
                         <div className="max-w-xl md:max-w-none md:w-full mx-auto md:col-span-7 lg:col-span-6 md:mt-6" data-aos="fade-right">
                             <div className="md:pr-4 lg:pr-12 xl:pr-16 mb-8">
                                 <h3 className="text-3xl font-bold mb-3">Powerful suite of tools</h3>
@@ -134,7 +130,7 @@ function Features() {
                                     leaveStart="opacity-100 translate-y-0"
                                     leaveEnd="opacity-0 -translate-y-16"
                                 >
-                                    <div className="relative inline-flex flex-col">
+                                    <div className="relative inline-flex flex-col shadow-xl">
                                         <img className="md:max-w-none mt-0 sm:mt-60 w-full max-h-32-rem transform animate-float" src="/storage/images/dashboard.png" alt="Finance Dashboard" />
                                     </div>
                                 </Transition>
