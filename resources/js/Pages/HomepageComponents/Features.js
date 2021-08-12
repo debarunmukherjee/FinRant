@@ -25,7 +25,7 @@ function Features() {
             <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="pt-12 md:pt-20">
                     <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
-                        <h1 className="text-3xl sm:text-4xl font-bold mb-4">Explore the solutions</h1>
+                        <h2 className="text-3xl sm:text-4xl font-bold mb-4">Explore the solutions</h2>
                         <p className="text-xl text-gray-600">
                             We provide every user feasibility to analyse their expenses in granular manner, by recording every expense in their own categories.
                         </p>
