@@ -93,4 +93,20 @@ class UserMonthlyBudget extends Model
     {
         return self::where('user_id', $userId)->sum('amount');
     }
+
+    /**
+     * Returns whether the user has set a monthly budget for the current month.
+     * @param $userId
+     * @return bool
+     */
+    public static function hasUserSetBudgetForCurrentMonth($userId): bool
+    {
+        $year = now()->year;
+        $month = now()->month;
+        return self::where([
+            ['user_id', $userId],
+            ['year', $year],
+            ['month', $month]
+        ])->exists();
+    }
 }
