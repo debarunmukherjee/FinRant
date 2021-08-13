@@ -42,7 +42,7 @@ class Expense extends Model
         if (!empty($transactionId)) {
             $expense->transaction_id = $transactionId;
         }
-        return $expense->save();
+        return $expense->save() && self::logUnsharedExpenseActivityMessageForPlan($planId, $userId, $amount, $categoryId, $transactionId);
     }
 
     /**
@@ -230,5 +230,55 @@ class Expense extends Model
     public static function getTotalExpenseOfUserAcrossAllPlans($userId): float
     {
         return self::where('user_id', $userId)->sum('amount');
+    }
+
+    /**
+     * Log activity message for an unshared expense.
+     * @param $planId
+     * @param $userId
+     * @param $amount
+     * @param $categoryId
+     * @param string $transactionId
+     * @return bool
+     */
+    public static function logUnsharedExpenseActivityMessageForPlan($planId, $userId, $amount, $categoryId, $transactionId = ''): bool
+    {
+        $srcUserDetails = User::getUserDetails($userId);
+        $categoryName = ExpendCategory::getCategoryNameFromId($categoryId);
+        if (!empty($transactionId)) {
+            $transactionDetails = Transaction::getTransactionDetails($transactionId);
+            $destUserDetails = User::getUserDetails($transactionDetails['to_user_id']);
+            $messages = [
+                PlanActivity::getFormattedUserFullnameForActivityMessage($srcUserDetails['full_name']) . " transfered an amount of  <b>$amount " .
+                UserInformation::getUserCurrencyCode($userId) . "</b> to " .
+                PlanActivity::getFormattedUserFullnameForActivityMessage($destUserDetails['full_name']) .
+                " as unshared expense under the category $categoryName."
+            ];
+        } else {
+            $messages = [
+                PlanActivity::getFormattedUserFullnameForActivityMessage($srcUserDetails['full_name']) . " recorded an amount of  <b>$amount " .
+                UserInformation::getUserCurrencyCode($userId) . "</b> as unshared expense under the category $categoryName."
+            ];
+        }
+        return PlanActivity::createPlanActivity($planId, $messages);
+    }
+
+    /**
+     * Log activity message for a shared expense.
+     * @param $expenseCreatorId
+     * @param $planId
+     * @param $categoryId
+     * @param $amount
+     * @return bool
+     */
+    public static function logSharedExpenseActivityMessageForPlan($expenseCreatorId, $planId, $categoryId, $amount): bool
+    {
+        $expenseCreatorDetails = User::getUserDetails($expenseCreatorId);
+        $categoryName = ExpendCategory::getCategoryNameFromId($categoryId);
+        $messages = [
+            PlanActivity::getFormattedUserFullnameForActivityMessage($expenseCreatorDetails['full_name']) . " recorded an amount of  <b>$amount " .
+            UserInformation::getUserCurrencyCode($expenseCreatorId) . "</b> as shared expense, divided equally among all members, under the category $categoryName."
+        ];
+        return PlanActivity::createPlanActivity($planId, $messages);
     }
 }

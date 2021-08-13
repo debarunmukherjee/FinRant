@@ -45,7 +45,7 @@ class PlanUserInvite extends Model
             $planMember->plan_id = $planId;
             $planMember->user_id = $userId;
 
-            return $result && $planMember->save();
+            return $result && $planMember->save() && self::logUserAcceptInviteActivity($userId, $planId);
         });
     }
 
@@ -90,5 +90,21 @@ class PlanUserInvite extends Model
         }
 
         return $invitesList;
+    }
+
+    /**
+     * Log user accepting invite activity message
+     * @param $userId
+     * @param $planId
+     * @return bool
+     */
+    public static function logUserAcceptInviteActivity($userId, $planId): bool
+    {
+        $userDetails = User::getUserDetails($userId);
+        $messages = [
+            PlanActivity::getFormattedUserFullnameForActivityMessage($userDetails['full_name']) . " just joined the plan.",
+            "We wish you happy savings!"
+        ];
+        return PlanActivity::createPlanActivity($planId, $messages);
     }
 }

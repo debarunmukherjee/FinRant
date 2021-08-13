@@ -129,4 +129,24 @@ class PendingPlanDebt extends Model
         }
         return $totalPending;
     }
+
+    /**
+     * Logs activity when a user makes a transaction to pay another user the pending debt.
+     * @param $planId
+     * @param $amount
+     * @param $srcUserId
+     * @param $destUserId
+     * @return bool
+     */
+    public static function logUserDebtClearanceActivity($planId, $amount, $srcUserId, $destUserId): bool
+    {
+        $srcUserDetails = User::getUserDetails($srcUserId);
+        $destUserDetails = User::getUserDetails($destUserId);
+        $messages = [
+            PlanActivity::getFormattedUserFullnameForActivityMessage($srcUserDetails['full_name']) . " made a payment of  <b>$amount " .
+            UserInformation::getUserCurrencyCode($srcUserId) . "</b> to " . PlanActivity::getFormattedUserFullnameForActivityMessage($destUserDetails['full_name']) . ' and cleared the mutual debt.'
+        ];
+
+        return PlanActivity::createPlanActivity($planId, $messages);
+    }
 }

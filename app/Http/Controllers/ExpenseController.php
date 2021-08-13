@@ -136,6 +136,8 @@ class ExpenseController extends Controller
 
                 // Lastly, make entries in the expense table for every member.
                 $result = $result && Expense::createSharedExpenseForAllPlanMembers($planId, $categoryId, $eachAmount, $sharedExpenseBatchId);
+                // Log shared expense activity
+                $result = $result && Expense::logSharedExpenseActivityMessageForPlan(Auth::id(), $planId, $categoryId, $expenseAmount);
                 if (!$result) {
                     throw new \Exception("Couldn't save expense item");
                 }
