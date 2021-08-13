@@ -21,6 +21,21 @@ FinRant is an app that helps you to efficiently plan all your expenses ahead of 
 - Other Libraries: [Inertia JS](https://inertiajs.com/) - Helped to couple my single page application frontend to the classic **Route-Controller** architecture of Laravel.
 - All other dev dependencies and libraries can be found in the composer and package json files.
 
+## Setting up dev environment
+
+- Install [Docker](https://www.docker.com/) for your corresponding os version
+- Install [Composer](https://getcomposer.org/).
+- Install [Node](https://nodejs.org/en/)
+- Clone the repo in your desired folder.
+- Run `composer install` in the cloned repo folder.
+- Run `npm install` in the cloned repo folder.
+- Configure a bash alias for Laravel Sail composer library, like so `./vendor/bin/sail up` if you don't want to type the entire path to run laravel artisan commands with sail.
+- Run `sail up` in the repo directory
+- Create a **.env** file and configure the correct values to connect to the mysql docker image. Refer to Laravel docs if you need help, they are super nice!
+- Run `sail artisan migrate` to run all the database migrations.
+- Try accessing the site by visiting **localhost**.
+- Feel free to create an issue if you are stuck anywhere.
+
 ## Team Members
 
 - Tech Lead: [Debarun Mukherjee](https://www.linkedin.com/in/debarun-mukherjee-a518a114b/)
