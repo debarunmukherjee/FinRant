@@ -34,4 +34,17 @@ class ExpendCategory extends Model
         ])->first();
         return empty($result) ? 0 : $result->id;
     }
+
+    /**
+     * Returns the category name from the category id.
+     * @param $categoryId
+     * @return string
+     */
+    public static function getCategoryNameFromId($categoryId): string
+    {
+        $result = self::where([
+            ['id', $categoryId]
+        ])->first();
+        return empty($result) ? '' : $result->name;
+    }
 }
