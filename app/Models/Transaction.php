@@ -36,4 +36,15 @@ class Transaction extends Model
         ]);
         return empty($record) ? false : $record->id;
     }
+
+    /**
+     * Returns the transactions details from the transaction id.
+     * @param $transactionId
+     * @return array
+     */
+    public static function getTransactionDetails($transactionId): array
+    {
+        $record = self::where('id', $transactionId)->first();
+        return empty($record) ? [] : $record->toArray();
+    }
 }
