@@ -73,7 +73,8 @@ class PlanCategoryBudget extends Model
                     })->join('expend_categories', 'expend_categories.id', '=', 'plan_category_budgets.category_id')
                       ->where([
                           ['plan_category_budgets.user_id', $userId],
-                          ['plan_category_budgets.plan_id', $planId]
+                          ['plan_category_budgets.plan_id', $planId],
+                          ['expenses.is_shared', 0]
                       ])
                       ->groupBy('plan_category_budgets.category_id', 'plan_category_budgets.amount', 'plan_category_budgets.plan_id')
                       ->get(['plan_category_budgets.amount as budget', DB::raw("ifnull(sum(expenses.amount), 0) as expense"), 'expend_categories.name'])

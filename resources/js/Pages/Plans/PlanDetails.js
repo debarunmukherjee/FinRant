@@ -131,7 +131,13 @@ export default function PlanDetails({ id }) {
                     </div>
                 </Grid>
             </Grid>
-            <h2 className="font-semibold mb-5 mt-6 text-xl sm:text-2xl">Budget vs Expense</h2>
+            <h2 className="font-semibold mb-5 mt-8 text-xl sm:text-2xl">Budget vs Expense</h2>
+            <p className="text-xs mt-1">
+                Please note that this will only show unshared expenses of the user.<br/>
+                As of now we consider every category as user specific and even when they belong to the same plan the categories are not shared.<br/>
+                When recording a shared expense we simply fetch the category name set the user creating the shared expense and use that name for recording expense of every user.<br/>
+                We are soon coming up with a feature of shared expense categories in a single plan, so that users will be able to set budgets for these and record expenses separately. But for now, shared expenses even with the same category name will <b>NOT</b> be shown here.
+            </p>
             <Divider className="w-2/3" style={{marginTop: '0.75rem', marginBottom: '0.5rem'}} />
             <div className="overflow-auto">
                 <div className="h-96 min-w-96 overflow-x-scroll">
