@@ -100,7 +100,8 @@ class PlanController extends Controller
                 'planRole' => $planRole,
                 'planMemberList' => $formattedPlanMemberList,
                 'userPendingTransactions' => $userPendingTransactionsResponseData,
-                'allUserExpenses' => $formattedAllExpensesData
+                'allUserExpenses' => $formattedAllExpensesData,
+                'planBudgetExpenseData' => PlanCategoryBudget::getBudgetVsExpenseDataForCategories(Auth::id(), $planId)
             ]
         );
     }

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Grid} from "@material-ui/core";
+import {Divider, Grid} from "@material-ui/core";
 import Button from "@/Components/Button";
 import {Inertia} from "@inertiajs/inertia";
 import {usePage} from "@inertiajs/inertia-react";
@@ -9,9 +9,10 @@ import {Alert} from "@material-ui/lab";
 import BudgetList from "@/Pages/Plans/BudgetList";
 import Table from "@/Components/Table";
 import AutocompleteSelect from "@/Components/AutocompleteSelect";
+import {ResponsiveContainer, BarChart, Bar, CartesianGrid, Tooltip, Legend, XAxis, YAxis} from "recharts";
 
 export default function PlanDetails({ id }) {
-    const { errors, categoryList, budgetList } = usePage().props;
+    const { errors, categoryList, budgetList, planBudgetExpenseData } = usePage().props;
     const [newCategory, setNewCategory] = useState('');
     const [openBudgetAddModal, setOpenBudgetAddModal] = useState(false);
     const [openBudgetEditModal, setOpenBudgetEditModal] = useState(false);
@@ -130,6 +131,39 @@ export default function PlanDetails({ id }) {
                     </div>
                 </Grid>
             </Grid>
+            <h2 className="font-semibold mb-5 mt-8 text-xl sm:text-2xl">Budget vs Expense</h2>
+            <p className="text-xs mt-1">
+                Please note that this will only show unshared expenses of the user.<br/>
+                As of now we consider every category as user specific and even when they belong to the same plan the categories are not shared.<br/>
+                When recording a shared expense we simply fetch the category name set the user creating the shared expense and use that name for recording expense of every user.<br/>
+                We are soon coming up with a feature of shared expense categories in a single plan, so that users will be able to set budgets for these and record expenses separately. But for now, shared expenses even with the same category name will <b>NOT</b> be shown here.
+            </p>
+            <Divider className="w-2/3" style={{marginTop: '0.75rem', marginBottom: '0.5rem'}} />
+            <div className="overflow-auto">
+                <div className="h-96 min-w-96 overflow-x-scroll">
+                    <ResponsiveContainer>
+                        <BarChart
+                            width={500}
+                            height={300}
+                            data={planBudgetExpenseData}
+                            margin={{
+                                top: 20,
+                                right: 30,
+                                left: 20,
+                                bottom: 5
+                            }}
+                        >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar isAnimationActive={true} dataKey="expense" stackId="a" fill="#8884d8" />
+                            <Bar isAnimationActive={true} dataKey="budget" stackId="a" fill="#82ca9d" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
             <Modal title="Set Budget" open={openBudgetAddModal} setOpen={setOpenBudgetAddModal} actionText="Set Budget" onClickAction={handleSetBudget}>
                 <div>
                     <label htmlFor="plan_name" className="block text-sm font-medium text-gray-700">
