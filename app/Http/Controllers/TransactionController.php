@@ -69,6 +69,7 @@ class TransactionController extends Controller
                     return false;
                 }
                 $result = PendingPlanDebt::settleDebtBetweenUsers($planId, $srcUserId, $destUserId);
+                $result = $result && PendingPlanDebt::logUserDebtClearanceActivity($planId, $amount, $srcUserId, $destUserId);
                 return $result && PlanDebtTransaction::savePlanDebtTransaction($planId, $transactionId);
             }
         );
