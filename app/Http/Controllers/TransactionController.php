@@ -64,7 +64,7 @@ class TransactionController extends Controller
 
         $result = DB::transaction(
             function () use ($planId, $amount, $srcUserId, $destUserId) {
-                $transactionId = Transaction::recordUserTransaction($srcUserId, $destUserId, $amount);
+                $transactionId = Transaction::recordUserTransaction($destUserId, $srcUserId, $amount);
                 if (empty($transactionId)) {
                     return false;
                 }
@@ -117,7 +117,7 @@ class TransactionController extends Controller
 
         $result = DB::transaction(
             function () use ($planId, $userId, $destUserId, $amount, $categoryId) {
-                $transactionId = Transaction::recordUserTransaction($userId, $destUserId, $amount);
+                $transactionId = Transaction::recordUserTransaction($destUserId, $userId, $amount);
                 if (empty($transactionId)) {
                     return false;
                 }
