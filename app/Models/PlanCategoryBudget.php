@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PlanCategoryBudget extends Model
 {
@@ -51,5 +52,31 @@ class PlanCategoryBudget extends Model
         ];
 
         return PlanActivity::createPlanActivity($planId, $messages);
+    }
+
+    /**
+     * Returns the budget and expense data for the budget category items set in a plan.<Br/>Return array format:<br/>
+     * ```
+     * [
+     *      ['budget' => budgetAmount, 'expense' => expenseAmount, 'name' => categoryName]
+     * ]
+     * ```
+     * @param $userId
+     * @param $planId
+     * @return array
+     */
+    public static function getBudgetVsExpenseDataForCategories($userId, $planId): array
+    {
+        return self::leftJoin('expenses', function ($join) {
+                        $join->on('expenses.category_id', '=', 'plan_category_budgets.category_id')
+                             ->on('expenses.plan_id', '=', 'plan_category_budgets.plan_id');
+                    })->join('expend_categories', 'expend_categories.id', '=', 'plan_category_budgets.category_id')
+                      ->where([
+                          ['plan_category_budgets.user_id', $userId],
+                          ['plan_category_budgets.plan_id', $planId]
+                      ])
+                      ->groupBy('plan_category_budgets.category_id', 'plan_category_budgets.amount', 'plan_category_budgets.plan_id')
+                      ->get(['plan_category_budgets.amount as budget', DB::raw("ifnull(sum(expenses.amount), 0) as expense"), 'expend_categories.name'])
+                      ->toArray();
     }
 }
