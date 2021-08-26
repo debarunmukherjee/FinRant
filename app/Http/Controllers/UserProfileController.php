@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Fusion;
 use App\Models\User;
 use App\Models\UserInformation;
 use App\Models\UserMonthlyBudget;
@@ -26,6 +27,7 @@ class UserProfileController extends Controller
         $userInformation = UserInformation::all()->where('user_id', $userId)->first();
         $country = $userInformation->country;
         $avatar = asset('storage/images/' . $userInformation->profile_picture);
+        $fusionAccountId = Fusion::getUserAccountId($userId) ;
 
         return Inertia::render('UserProfile', [
             'userDetails' => [
@@ -35,7 +37,8 @@ class UserProfileController extends Controller
                 'country' => $country,
                 'avatar' => $avatar,
                 'currency' => UserInformation::getUserCurrencyCode($userId),
-                'monthlyBudget' => UserMonthlyBudget::getUserBudgetForCurrentMonth($userId)
+                'monthlyBudget' => UserMonthlyBudget::getUserBudgetForCurrentMonth($userId),
+                'fusionAccountId' => empty($fusionAccountId) ? '' : $fusionAccountId
             ],
             'countryList' => Countries::all()->pluck('name.common')->toArray()
         ]);

@@ -1,11 +1,13 @@
 import Authenticated from '@/Layouts/Authenticated';
 import React, {useEffect, useState} from 'react';
-import {Grid} from "@material-ui/core";
+import {Divider, Grid} from "@material-ui/core";
 import AutocompleteSelect from "@/Components/AutocompleteSelect";
 import ImageUpload from "@/Components/ImageUpload";
 import {Inertia} from "@inertiajs/inertia";
 import {getCurrentMonth} from "@/Utils/Common";
 import NumberInput from "@/Components/NumberInput";
+import FusionAccountHolderForm from "@/Components/FusionAccountHolderForm";
+import {Alert} from "@material-ui/lab";
 
 export default function Dashboard(props) {
     const { userDetails, countryList, errors } = props;
@@ -128,6 +130,16 @@ export default function Dashboard(props) {
                                     </Grid>
                                 </Grid>
                             </form>
+                            <h3 className="text-2xl mt-7">Create Fusion Account</h3>
+                            <p className="text-xs mt-1">You need to create an account with Fusion to be able to transfer funds among plan members.</p>
+                            <Divider className="w-2/3" style={{marginTop: '0.75rem', marginBottom: '0.5rem'}} />
+                            {!userDetails.fusionAccountId ? (
+                                <FusionAccountHolderForm/>
+                            ) : (
+                                <Alert className="mt-2 max-w-full sm:max-w-3/4" severity="success">
+                                    Congratulations! Your Fusion wallet account has been successfully created. You can now perform Peer to Peer transfer.
+                                </Alert>
+                            )}
                         </div>
                     </div>
                 </div>
