@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Divider, Grid} from "@material-ui/core";
+import {Divider, Grid, List, ListItem, ListItemText} from "@material-ui/core";
 import Button from "@/Components/Button";
 import {Inertia} from "@inertiajs/inertia";
 import {usePage} from "@inertiajs/inertia-react";
@@ -7,9 +7,16 @@ import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import Modal from "@/Components/Modal";
 import {Alert} from "@material-ui/lab";
 import BudgetList from "@/Pages/Plans/BudgetList";
-import Table from "@/Components/Table";
 import AutocompleteSelect from "@/Components/AutocompleteSelect";
 import {ResponsiveContainer, BarChart, Bar, CartesianGrid, Tooltip, Legend, XAxis, YAxis} from "recharts";
+import {makeStyles} from "@material-ui/core/styles";
+import CustomSwitch from "@/Components/Switch";
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        padding: '1rem'
+    },
+}));
 
 export default function PlanDetails({ id }) {
     const { errors, categoryList, budgetList, planBudgetExpenseData } = usePage().props;
@@ -22,6 +29,9 @@ export default function PlanDetails({ id }) {
     const [selectedBudgetItemIndex, setSelectedBudgeItemIndex] = useState(0);
     const [editedBudgetAmount, setEditedBudgetAmount] = useState(0);
     const [selectedBudgetItemToBeDeleted, setSelectedBudgetItemToBeDeleted] = useState(0);
+    const [showOnlySharedCategories, setShowOnlySharedCategories] = useState(false);
+
+    const classes = useStyles();
 
     useEffect(() => {
         if (!errors.categoryName) {
@@ -100,21 +110,31 @@ export default function PlanDetails({ id }) {
                     </div>
                     {errors.categoryName ? (<p className="text-red-500 text-xs mt-1">{errors.categoryName}</p>) : ''}
                     <div className="mt-12">
-                        <h2 className="font-semibold mb-5 text-xl text-center sm:text-2xl">Your Categories:</h2>
+                        <h2 className="font-semibold mb-5 text-xl text-center sm:text-2xl">Available Categories:</h2>
                         {categoryList.length > 0 ? (
-                            <Table headers={['Name']}>
-                                {categoryList.map((category, index) => (
-                                    <tr key={index}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex items-center">
-                                                <div className="ml-4">
-                                                    <div className="text-sm font-medium text-gray-900">{category.name}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </Table>
+                            <div className="shadow-md mx-auto w-full rounded">
+                                <div className='shadow-lg mb-4 p-3'>
+                                    <CustomSwitch
+                                        isEnabled={showOnlySharedCategories}
+                                        setIsEnabled={(value) => {setShowOnlySharedCategories(value)}}
+                                        labelText=""
+                                        shouldDisplayYesNo={false}
+                                        customClass='float-right'
+                                    />
+                                    <p className="text-xl font-semibold">Your Categories</p>
+                                </div>
+                                <List
+                                    component="nav"
+                                    aria-labelledby="categories"
+                                    className={`${classes.root} max-h-20-rem overflow-y-scroll divide-y divide-gray-200`}
+                                >
+                                    {categoryList.map((category, index) => (
+                                        <ListItem key={index}>
+                                            <ListItemText primary={category.name}/>
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </div>
                         ) : (<Alert severity="info">You created any categories.</Alert>)}
                     </div>
                 </Grid>

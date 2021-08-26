@@ -26,7 +26,8 @@ module.exports = {
                 '96': '24rem',
             },
             maxHeight: {
-                '32-rem': '32rem'
+                '32-rem': '32rem',
+                '20-rem': '20rem'
             },
             height: {
                 '60-vh': '60vh',
