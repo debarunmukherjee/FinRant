@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ExpendCategory;
 use App\Models\Expense;
+use App\Models\Fusion;
 use App\Models\PendingPlanDebt;
 use App\Models\Plan;
 use App\Models\PlanDebtTransaction;
@@ -34,6 +35,7 @@ class TransactionController extends Controller
                     }
                 }
             ],
+            'upiId' => ['required', 'string'],
             'destUserEmail' => [
                 'email',
                 'required',
@@ -59,12 +61,20 @@ class TransactionController extends Controller
         ]);
 
         // todo: At this point the user should be redirected to the payment gateway to transfer money to the other user.
-
+        $destUserAccountId = Fusion::getUserAccountId($destUserId);
+        $srcUserAccountId = Fusion::getUserAccountId($srcUserId);
+        if (empty($destUserAccountId)) {
+            return Redirect::back()->with('error', 'The destination user has not yet setup a Fusion account!');
+        }
+        if (empty($srcUserAccountId)) {
+            return Redirect::back()->with('error', 'You have not yet setup a Fusion account! You can do so by visiting your profile and submitting the required details.');
+        }
         // The work being done below this comment, should ideally be done we get a confirmation that the transaction was successful.
 
         $result = DB::transaction(
             function () use ($planId, $amount, $srcUserId, $destUserId) {
-                $transactionId = Transaction::recordUserTransaction($destUserId, $srcUserId, $amount);
+                [$transactionUniqueKey, $fusionTransactionId] = Fusion::transferFundsToUser($destUserId, $amount);
+                $transactionId = Transaction::recordUserTransaction($destUserId, $srcUserId, $amount, $transactionUniqueKey, $fusionTransactionId);
                 if (empty($transactionId)) {
                     return false;
                 }
@@ -89,6 +99,7 @@ class TransactionController extends Controller
         $categoryId = ExpendCategory::getCategoryIdFromName($request->post('category'), $userId);
         $request->validate([
             'planId' => ['required', 'numeric', 'exists:plans,id'],
+            'upiId' => ['required', 'string'],
             'selectedUserEmail' => [
                 'required',
                 'email',
@@ -113,12 +124,21 @@ class TransactionController extends Controller
         ]);
 
         // todo: At this point the user should be redirected to the payment gateway to transfer money to the other user.
+        $destUserAccountId = Fusion::getUserAccountId($destUserId);
+        $srcUserAccountId = Fusion::getUserAccountId($userId);
+        if (empty($destUserAccountId)) {
+            return Redirect::back()->with('error', 'The destination user has not yet setup a Fusion account!');
+        }
+        if (empty($srcUserAccountId)) {
+            return Redirect::back()->with('error', 'You have not yet setup a Fusion account! You can do so by visiting your profile and submitting the required details.');
+        }
 
         // On successful transfer, we will record the expense and transaction - the stuff being done below.
 
         $result = DB::transaction(
             function () use ($planId, $userId, $destUserId, $amount, $categoryId) {
-                $transactionId = Transaction::recordUserTransaction($destUserId, $userId, $amount);
+                [$transactionUniqueKey, $fusionTransactionId] = Fusion::transferFundsToUser($destUserId, $amount);
+                $transactionId = Transaction::recordUserTransaction($destUserId, $userId, $amount, $transactionUniqueKey, $fusionTransactionId);
                 if (empty($transactionId)) {
                     return false;
                 }

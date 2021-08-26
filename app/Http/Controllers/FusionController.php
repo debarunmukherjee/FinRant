@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Fusion;
 use App\Models\UserInformation;
+use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +29,8 @@ class FusionController extends Controller
             'dobDay' => ['required', 'numeric', 'gt:0']
         ]);
         $userId = Auth::id();
-        $result = DB::transaction(function () use($request, $userId) {
+        DB::beginTransaction();
+        try {
             $result = (bool) UserInformation::where('user_id', $userId)->update([
                 'phone_number' => $request->post('phone'),
                 'pan' => $request->post('pan'),
@@ -37,15 +39,19 @@ class FusionController extends Controller
                 'dob_month' => $request->post('dobMonth'),
                 'dob_day' => $request->post('dobDay'),
             ]);
-
             $result = $result && Fusion::createAccountHolder($userId);
-            return $result && Fusion::issueBundle($userId);
-        });
+            $result && Fusion::issueBundle($userId);
+            DB::commit();
+        } catch (Exception $exception) {
+            $result = false;
+            $message = $exception->getMessage();
+            DB::rollBack();
+        }
 
         if ($result) {
             return Redirect::back()->with('success', 'You Fusion account has been successfully created!');
         }
 
-        return Redirect::back()->with('error', 'You Fusion account could not be created.');
+        return Redirect::back()->with('error', empty($message) ? 'You Fusion account could not be created.' : $message);
     }
 }

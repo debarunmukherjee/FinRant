@@ -19,6 +19,8 @@ export default function MemberExpenseTransaction({ planId }) {
     const [ selectedUserToPayError, setSelectedUserToPayError ] = useState('');
     const [ selectedExpenseCategoryToPayError, setSelectedExpenseCategoryToPayError ] = useState('');
     const [ amountToPayError, setAmountToPayError ] = useState('');
+    const [ upiId, setUpiId ] = useState('');
+    const [ upiIdError, setUpiIdError ] = useState('');
 
     useEffect(() => {
         setSelectedUserToPay(planMemberList[0]);
@@ -31,20 +33,24 @@ export default function MemberExpenseTransaction({ planId }) {
         setSelectedUserToPay(planMemberList[0]);
         setAmountToPay(0);
         setUserPassword('');
+        setUpiId('');
         setUserPasswordError('');
         setSelectedUserToPayError('');
         setAmountToPayError('');
         setSelectedExpenseCategoryToPayError('');
+        setUpiIdError('');
+        setOpenPaymentModal(false);
         if (categoryList.length > 0) {
             setSelectedExpenseCategoryToPay(categoryList[0]);
         }
     }
     useEffect(() => {
-        if (errors.password || errors.selectedUserEmail || errors.amount || errors.category) {
+        if (errors.password || errors.selectedUserEmail || errors.amount || errors.category || errors.upiId) {
             setUserPasswordError(errors.password);
             setSelectedUserToPayError(errors.selectedUserEmail);
             setAmountToPayError(errors.amount);
             setSelectedExpenseCategoryToPayError(errors.category);
+            setUpiIdError(errors.upiId);
         } else {
             resetAllErrorsAndStates();
         }
@@ -63,7 +69,8 @@ export default function MemberExpenseTransaction({ planId }) {
             category: selectedExpenseCategoryToPay.name,
             amount: amountToPay,
             password: userPassword,
-            planId: planId
+            planId: planId,
+            upiId: upiId
         });
     }
 
@@ -141,6 +148,20 @@ export default function MemberExpenseTransaction({ planId }) {
                 <div className="mt-2">
                     <Divider style={{marginTop: '0.75rem', marginBottom: '0.75rem'}} />
                     <label htmlFor="user_password" className="block font-medium text-gray-700">
+                        Enter UPI ID <img src="/storage/images/upi.png" alt="upi logo" width={50} className="inline"/>
+                    </label>
+                    <div className="mt-1">
+                        <input
+                            type="text"
+                            className="w-auto focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300"
+                            value={upiId}
+                            onChange={(e) => {
+                                setUpiId(e.target.value);
+                            }}
+                        />
+                        {upiIdError ? (<p className="text-red-500 text-xs mt-1">{upiIdError}</p>) : ''}
+                    </div>
+                    <label htmlFor="user_password" className="block font-medium text-gray-700 mt-4">
                         Enter Password
                     </label>
                     <div className="mt-1">

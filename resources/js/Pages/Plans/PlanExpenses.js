@@ -14,13 +14,19 @@ export default function PlanExpenses({ planId }) {
     const [ paymentAmount, setPaymentAmount ] = useState(0);
     const [ userPassword, setUserPassword ] = useState('');
     const [ userPasswordError, setUserPasswordError ] = useState('');
+    const [ upiId, setUpiId ] = useState('');
+    const [ upiIdError, setUpiIdError ] = useState('');
 
     useEffect(() => {
-        if (errors.password) {
+        if (errors.password || errors.upiId) {
             setUserPasswordError(errors.password);
+            setUpiIdError(errors.upiId);
         } else {
             setUserPasswordError('');
             setUserPassword('');
+            setUpiIdError('');
+            setUpiId('');
+            setOpenPaymentModal(false);
         }
     },[errors]);
 
@@ -29,7 +35,8 @@ export default function PlanExpenses({ planId }) {
             destUserEmail: selectedUserEmail,
             amount: paymentAmount,
             password: userPassword,
-            planId: planId
+            planId: planId,
+            upiId: upiId
         });
     }
 
@@ -43,6 +50,8 @@ export default function PlanExpenses({ planId }) {
         if (!isOpen) {
             setUserPasswordError('');
             setUserPassword('');
+            setUpiIdError('');
+            setUpiId('');
         }
         setOpenPaymentModal(isOpen);
     }
@@ -150,6 +159,20 @@ export default function PlanExpenses({ planId }) {
                 <div className="mt-2">
                     <Divider style={{marginTop: '0.75rem', marginBottom: '0.75rem'}} />
                     <label htmlFor="user_password" className="block font-medium text-gray-700">
+                        Enter UPI ID <img src="/storage/images/upi.png" alt="upi logo" width={50} className="inline"/>
+                    </label>
+                    <div className="mt-1">
+                        <input
+                            type="text"
+                            className="w-auto focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded sm:text-sm border-gray-300"
+                            value={upiId}
+                            onChange={(e) => {
+                                setUpiId(e.target.value);
+                            }}
+                        />
+                        {upiIdError ? (<p className="text-red-500 text-xs mt-1">{upiIdError}</p>) : ''}
+                    </div>
+                    <label htmlFor="user_password" className="block font-medium text-gray-700 mt-4">
                         Enter Password
                     </label>
                     <div className="mt-1">

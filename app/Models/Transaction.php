@@ -14,7 +14,8 @@ class Transaction extends Model
         'transaction_unique_key',
         'to_user_id',
         'from_user_id',
-        'amount'
+        'amount',
+        'fusion_transaction_id'
     ];
 
     /**
@@ -25,13 +26,13 @@ class Transaction extends Model
      * @param $amount
      * @return false|string
      */
-    public static function recordUserTransaction($toUserId, $fromUserId, $amount)
+    public static function recordUserTransaction($toUserId, $fromUserId, $amount, $transactionUniqueKey, $fusionTransactionId)
     {
-        $transactionUniqueKey = Str::random(64);
         $record = self::create([
             'transaction_unique_key' => $transactionUniqueKey,
             'to_user_id' => $toUserId,
             'from_user_id' => $fromUserId,
+            'fusion_transaction_id' => $fusionTransactionId,
             'amount' => $amount
         ]);
         return empty($record) ? false : $record->id;

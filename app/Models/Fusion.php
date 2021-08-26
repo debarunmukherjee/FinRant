@@ -84,6 +84,12 @@ class Fusion extends Model
 
         $responseArray = json_decode($response,true);
 
+        if ($responseArray['status'] !== 'APPROVED') {
+            throw new ErrorException((empty($responseArray['statusDetails']) || !array_key_exists('message', $responseArray['statusDetails'])) ?
+                'Failed to create fusion account holder.' :
+                $responseArray['statusDetails']['message']
+            );
+        }
         $fusionAccount = new Fusion();
         $fusionAccount->user_id = $userId;
         $fusionAccount->account_holder_details = $response;
@@ -148,5 +154,65 @@ class Fusion extends Model
         $fusionAccount = self::where('user_id', $userId)->first();
         $fusionAccount->account_id = $responseArray['accounts'][0]['accountID'];
         return $fusionAccount->save();
+    }
+
+    /**
+     * @param $userId
+     * @param $amount
+     * @return array
+     * @throws ErrorException
+     */
+    public static function transferFundsToUser($userId, $amount): array
+    {
+        $fundingAccountId = config('finrant.fusion_funding_ac_id');
+        $transactionUniqueKey = 'finrant-' . Str::random(30);
+        $data = [
+            'requestID' => $transactionUniqueKey,
+            'amount' => [
+                'currency' => 'INR',
+                'amount' => $amount
+            ],
+            'transferCode' => 'A2A_VBOPayout-VBO2U_AUTH',
+            'debitAccountID' => $fundingAccountId,
+            'creditAccountID' => self::getUserAccountId($userId),
+            'transferTime' => time(),
+            'remarks' => "Transferring to user_id $userId"
+        ];
+        $curl = curl_init();
+        $ifiId = config('finrant.fusion_ifi_id');
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://fusion.preprod.zeta.in/api/v1/ifi/$ifiId/transfers",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($data),
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+                'X-Zeta-AuthToken: eyJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwidGFnIjoidllsMkxES0hZRTQxaHVfb1hiM0NwUSIsImFsZyI6IkExMjhHQ01LVyIsIml2IjoiZFNidTBUUVVBZ2NEczhpYSJ9.eCgX6lEZq7TxNYtFkvepigHw8BBIcUbW711JPVAGI4c.L_ekBI7ow-c9OHGFJJ1LGw.1xGOTyj5vAmHJaFlCud_Y5Qzh98KHcKAwlzf30QPu5IYTxooE7RPstovO5yTLe9seIsJrKzZOHT3wgt9d13I196gJAx7J6KV0axV6UFx-bxWh6qxCZtIYCYcnk0XOPO6fQKU_81Y1AQgJUIfw2z03iMPBP-A5t-Kidh0CSUqsNJ15CRthwZdayTaq8FYJ8B9hMGJxsS1l8wuqRyvIWwrxdGzvhaGW3_HxIKK7gOT4ljJ-Yeq51p1UIDHNpchhnVPrvIWQxcLiUjb0NmRuTDAmAsLz_KL4Jg8tZGwjnwqfAh2IDJRmYIrrijPX_YnC6Xlzv6TcGgp5120SdviWwqhjq6vMhfCo1jPDjXSnVp83lC3S-hXSjPAfmUNpqm698BK.kcvOICcfz6uyDzYMlFIc2Q'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+
+        if (empty($response)) {
+            throw new ErrorException('Fund transfer failed.');
+        }
+
+        $responseArray = json_decode($response, true);
+        logger($response);
+        if (empty($responseArray['status']) || $responseArray['status'] !== 'SUCCESS') {
+            throw new ErrorException('Fund transfer failed.');
+        }
+
+        return [
+            $transactionUniqueKey,
+            $responseArray['transferID']
+        ];
     }
 }
