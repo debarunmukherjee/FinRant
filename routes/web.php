@@ -4,6 +4,7 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\FusionController;
 use App\Http\Controllers\InviteUserController;
 use App\Http\Controllers\PlanActivityController;
 use App\Http\Controllers\PlanController;
@@ -53,6 +54,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/user/plan/fund-transfer', [TransactionController::class, 'interPlanFundTransfer']);
     Route::get('/plan-activities', [PlanActivityController::class, 'getActivities']);
     Route::get('/get/total-expense', [ExpenseController::class, 'getTotalUserExpenseForPlan']);
+    Route::post('/create-fusion-account', [FusionController::class, 'createFusionAccount']);
 });
 
 require __DIR__.'/auth.php';
