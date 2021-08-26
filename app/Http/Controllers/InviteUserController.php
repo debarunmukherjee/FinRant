@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewInvite;
 use App\Models\Plan;
 use App\Models\PlanUserInvite;
 use App\Models\User;
@@ -62,6 +63,7 @@ class InviteUserController extends Controller
         if (!$result) {
             return Redirect::back()->with('error', 'Could not set invite');
         }
+        broadcast(new NewInvite($invite));
         return Redirect::back()->with('success', 'Your invite request has been sent!');
     }
 

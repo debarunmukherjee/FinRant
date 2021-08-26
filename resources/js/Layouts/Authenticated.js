@@ -5,13 +5,17 @@ import React, {useEffect, useState} from 'react';
 import ResponsiveNavLink from '../Components/ResponsiveNavLink';
 import {InertiaLink, usePage} from '@inertiajs/inertia-react';
 import Notification from "@/Components/Notification";
+import { useSnackbar } from 'notistack';
 
 export default function Authenticated({ auth, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const [openSuccess, setOpenSuccess] = useState(false);
     const [openMessage, setOpenMessage] = useState(false);
     const [openError, setOpenError] = useState(false);
+    const [ totalInvites, setTotalInvites ] = useState(0);
     const { flash } = usePage().props;
+
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         if (flash.message) {
@@ -23,7 +27,18 @@ export default function Authenticated({ auth, header, children }) {
         if (flash.error) {
             setOpenError(true);
         }
-    }, [flash])
+    }, [flash]);
+
+    useEffect(() => {
+        setTotalInvites(auth.user.pendingInvites);
+        Echo.private('plan-invite.' + auth.user.id)
+            .listen('NewInvite', (inviteDetails) => {
+                setTotalInvites(inviteDetails.totalInvites);
+                enqueueSnackbar(`${inviteDetails.inviterName} invited you to join the plan ${inviteDetails.planName}`, {
+                    variant: 'success',
+                });
+            });
+    },[]);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -92,7 +107,7 @@ export default function Authenticated({ auth, header, children }) {
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.1} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                                         </svg>
                                                         <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-3 bg-blue-400 rounded-full">
-                                                            {auth.user.pendingInvites}
+                                                            {totalInvites}
                                                         </span>
                                                     </span>
                                                 </p>
@@ -166,7 +181,7 @@ export default function Authenticated({ auth, header, children }) {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.1} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                         </svg>
                                         <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-3 bg-blue-400 rounded-full">
-                                            {auth.user.pendingInvites}
+                                            {totalInvites}
                                         </span>
                                     </span>
                                 </p>
