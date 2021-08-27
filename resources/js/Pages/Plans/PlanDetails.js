@@ -10,7 +10,6 @@ import BudgetList from "@/Pages/Plans/BudgetList";
 import AutocompleteSelect from "@/Components/AutocompleteSelect";
 import {ResponsiveContainer, BarChart, Bar, CartesianGrid, Tooltip, Legend, XAxis, YAxis} from "recharts";
 import {makeStyles} from "@material-ui/core/styles";
-import CustomSwitch from "@/Components/Switch";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -29,7 +28,6 @@ export default function PlanDetails({ id }) {
     const [selectedBudgetItemIndex, setSelectedBudgeItemIndex] = useState(0);
     const [editedBudgetAmount, setEditedBudgetAmount] = useState(0);
     const [selectedBudgetItemToBeDeleted, setSelectedBudgetItemToBeDeleted] = useState(0);
-    const [showOnlySharedCategories, setShowOnlySharedCategories] = useState(false);
 
     const classes = useStyles();
 
@@ -114,13 +112,6 @@ export default function PlanDetails({ id }) {
                         {categoryList.length > 0 ? (
                             <div className="shadow-md mx-auto w-full rounded">
                                 <div className='shadow-lg mb-4 p-3'>
-                                    <CustomSwitch
-                                        isEnabled={showOnlySharedCategories}
-                                        setIsEnabled={(value) => {setShowOnlySharedCategories(value)}}
-                                        labelText=""
-                                        shouldDisplayYesNo={false}
-                                        customClass='float-right'
-                                    />
                                     <p className="text-xl font-semibold">Your Categories</p>
                                 </div>
                                 <List
