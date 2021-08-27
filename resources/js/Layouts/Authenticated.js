@@ -38,6 +38,18 @@ export default function Authenticated({ auth, header, children }) {
                     variant: 'success',
                 });
             });
+        Echo.private('reject-invite.' + auth.user.id)
+            .listen('RejectInvite', (inviteDetails) => {
+                enqueueSnackbar(`${inviteDetails.invitedName} rejected your invite to join the plan ${inviteDetails.planName}`, {
+                    variant: 'error',
+                });
+            });
+        Echo.private('accept-invite.' + auth.user.id)
+            .listen('AcceptInvite', (inviteDetails) => {
+                enqueueSnackbar(`${inviteDetails.invitedName} accepted your invite to join the plan ${inviteDetails.planName}`, {
+                    variant: 'success',
+                });
+            });
     },[]);
 
     return (

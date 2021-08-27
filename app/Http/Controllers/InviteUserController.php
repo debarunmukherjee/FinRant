@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AcceptInvite;
 use App\Events\NewInvite;
+use App\Events\RejectInvite;
 use App\Models\Plan;
 use App\Models\PlanUserInvite;
 use App\Models\User;
@@ -103,7 +105,12 @@ class InviteUserController extends Controller
         $planId = $request->post('planId');
 
         $this->performInviteActionValidations($request, $userId, $planId, $inviterUserId);
-
+        $invite = PlanUserInvite::where([
+            ['sent_by', $inviterUserId],
+            ['sent_to', $userId],
+            ['plan_id', $planId]
+        ])->first();
+        broadcast(new AcceptInvite($invite));
         if (PlanUserInvite::acceptUserInvite($inviterUserId, $userId, $planId)) {
             return Redirect::back()->with('success', 'You have been successfully added to the plan!');
         }
@@ -117,7 +124,12 @@ class InviteUserController extends Controller
         $planId = $request->post('planId');
 
         $this->performInviteActionValidations($request, $userId, $planId, $inviterUserId);
-
+        $invite = PlanUserInvite::where([
+            ['sent_by', $inviterUserId],
+            ['sent_to', $userId],
+            ['plan_id', $planId]
+        ])->first();
+        broadcast(new RejectInvite($invite));
         if (PlanUserInvite::rejectUserInvite($inviterUserId, $userId, $planId)) {
             return Redirect::back()->with('success', 'The invite has been rejected');
         }

@@ -21,3 +21,11 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('plan-invite.{invitedUserId}', function ($user, $invitedUserId) {
     return (int) $user->id === (int)$invitedUserId;
 });
+
+Broadcast::channel('reject-invite.{inviterUserId}', function ($user, $inviterUserId) {
+    return (int) $user->id === (int)$inviterUserId;
+});
+
+Broadcast::channel('accept-invite.{inviterUserId}', function ($user, $inviterUserId) {
+    return (int) $user->id === (int)$inviterUserId;
+});

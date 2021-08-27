@@ -13,7 +13,7 @@ const el = document.getElementById('app');
 
 render(
     (
-        <SnackbarProvider maxSnack={3} anchorOrigin={{vertical: 'bottom', horizontal: 'right'}} TransitionComponent={Slide}>
+        <SnackbarProvider maxSnack={1} anchorOrigin={{vertical: 'bottom', horizontal: 'right'}} TransitionComponent={Slide}>
             <App initialPage={JSON.parse(el.dataset.page)} resolveComponent={(name) => require(`./Pages/${name}`).default} />)
         </SnackbarProvider>
     ),
