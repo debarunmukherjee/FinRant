@@ -35,6 +35,14 @@ FinRant is an app that helps you to efficiently plan all your expenses ahead of 
 - Run `sail artisan migrate` to run all the database migrations.
 - Try accessing the site by visiting **localhost**.
 - Feel free to create an issue if you are stuck anywhere.
+- Ensure to fill in the environment values properly as below -
+  ```
+  FUSION_AUTH_TOKEN=""
+  FUSION_FUNDING_ACCOUNT_ID=""
+  FUSION_BUNDLE_ID=""
+  FUSION_IFI_ID=""
+  FUSION_BUNDLE_NAME=""
+  ```
 
 ## Team Members
 
