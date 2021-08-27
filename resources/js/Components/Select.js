@@ -4,7 +4,7 @@ import {CheckIcon, SelectorIcon} from '@heroicons/react/solid'
 
 export default function Select({ options, label, selected, setSelected, noOptionText }) {
     return (
-        <div className="w-72">
+        <div className="w-auto">
             <Listbox value={selected} onChange={setSelected}>
                 <div className="relative mt-1">
                     <Listbox.Button
