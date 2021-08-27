@@ -124,13 +124,25 @@ export default function PlanExpenses({ planId }) {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                                 {expense.isShared ? (
-                                    <ul className="text-xs">
-                                        {expense.shareDetails.map((detail, index) => (
-                                            <li key={`user-who-paid-${index}-expense-item-${expIndex}`}>
-                                                {getFullNameFromEmail(detail.userEmailWhoPaid)} paid {detail.amount}
-                                            </li>
-                                        ))}
-                                    </ul>
+                                    <>
+                                        <ul className="text-xs">
+                                            {expense.shareDetails.map((detail, index) => (
+                                                <li key={`user-who-paid-${index}-expense-item-${expIndex}`}>
+                                                    {getFullNameFromEmail(detail.userEmailWhoPaid)} paid {detail.amount}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <Divider className="w-2/3" style={{marginTop: '0.75rem', marginBottom: '0.75rem'}} />
+                                        {expense.isEqualDistribution ? (<p className="text-xs">The expense was distributed equally.</p>) : (
+                                            <ul className="text-xs">
+                                                {expense.distributionDetails.map((detail, index) => (
+                                                    <li key={`user-dist-${index}-expense-item-${expIndex}`}>
+                                                        {getFullNameFromEmail(detail.distributionUserEmail)} shares {detail.amount}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </>
                                 ) : 'N.A.'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">

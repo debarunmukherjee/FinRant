@@ -7,6 +7,11 @@ export const initialRecordExpenseState = {
     sharedExpenseMemberAmount: 0,
     sharedExpenseMembersPaidEqually: true,
     sharedMemberExpenseError: '',
+    sharedExpenseMembersDistributedEqually: true,
+    sharedExpenseMembersDistribution : [],
+    sharedExpenseDistributionMemberToBeAdded : {},
+    sharedExpenseMemberDistributionAmount: 0,
+    sharedMemberDistributionError: '',
     shouldResetAllValues: false
 }
 

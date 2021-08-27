@@ -46,18 +46,17 @@ class Expense extends Model
     }
 
     /**
-     * Create an equal expense of amount `$amount` for each member of a plan. Use this to save an expense that is shared by every member of a plan.
+     * Create an expense for each member of a plan based on `$planExpenseDistribution`.
      * @param $planId
      * @param $categoryId
      * @param $amount
      * @param $sharedExpenseBatchId
      * @return bool
      */
-    public static function createSharedExpenseForAllPlanMembers($planId, $categoryId, $amount, $sharedExpenseBatchId): bool
+    public static function createSharedExpenseForPlanMembers($planId, $categoryId, $planExpenseDistribution, $sharedExpenseBatchId): bool
     {
-        $planMemberUserIds = PlanMember::getAllPlanMemberUserIds($planId);
         $result = true;
-        foreach ($planMemberUserIds as $planMemberUserId) {
+        foreach ($planExpenseDistribution as $planMemberUserId => $amount) {
             $expense = new Expense;
             $expense->category_id = $categoryId;
             $expense->user_id = $planMemberUserId;
@@ -164,9 +163,15 @@ class Expense extends Model
 
         foreach ($expenseData as $expenseDatum) {
             $isShared = $expenseDatum['is_shared'];
+            $isEqualDistribution = false;
             $shareDetails = [];
+            $distributionDetails = [];
             if ($isShared) {
                 $shareDetails = SharedExpenseDetail::getSharedExpenseDetails($expenseDatum['shared_expense_batch_id']);
+                $isEqualDistribution = (int)($shareDetails[0]['is_equal_distribution']) === 1;
+                if (!$isEqualDistribution) {
+                    $distributionDetails = ExpenseDistribution::getExpenseDistributionDetails($expenseDatum['shared_expense_batch_id']);
+                }
             }
 
             $result[] = [
@@ -174,7 +179,9 @@ class Expense extends Model
                 'createdAt' => $expenseDatum['created_at'],
                 'amount' => $expenseDatum['amount'],
                 'isShared' => (int)$isShared === 1,
-                'shareDetails' => $shareDetails
+                'shareDetails' => $shareDetails,
+                'isEqualDistribution' => $isEqualDistribution,
+                'distributionDetails' => $distributionDetails
             ];
         }
 
@@ -277,7 +284,7 @@ class Expense extends Model
         $categoryName = ExpendCategory::getCategoryNameFromId($categoryId);
         $messages = [
             PlanActivity::getFormattedUserFullnameForActivityMessage($expenseCreatorDetails['full_name']) . " recorded an amount of  <b>$amount " .
-            UserInformation::getUserCurrencyCode($expenseCreatorId) . "</b> as shared expense, divided equally among all members, under the category $categoryName."
+            UserInformation::getUserCurrencyCode($expenseCreatorId) . "</b> as shared expense, under the category $categoryName."
         ];
         return PlanActivity::createPlanActivity($planId, $messages);
     }

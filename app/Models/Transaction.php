@@ -24,6 +24,8 @@ class Transaction extends Model
      * @param $toUserId
      * @param $fromUserId
      * @param $amount
+     * @param $transactionUniqueKey
+     * @param $fusionTransactionId
      * @return false|string
      */
     public static function recordUserTransaction($toUserId, $fromUserId, $amount, $transactionUniqueKey, $fusionTransactionId)

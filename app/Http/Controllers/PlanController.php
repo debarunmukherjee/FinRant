@@ -81,6 +81,15 @@ class PlanController extends Controller
                     ];
                 }
             }
+            $formattedSharedExpenseDistributionDetails = [];
+            if (!$allExpensesDatum['isEqualDistribution']) {
+                foreach ($allExpensesDatum['distributionDetails'] as $distributionDetail) {
+                    $formattedSharedExpenseDistributionDetails[] = [
+                        'distributionUserEmail' => $planMemberList[$distributionDetail['distributionUserId']]['email'],
+                        'amount' => $distributionDetail['amount']
+                    ];
+                }
+            }
             $createdAt = new DateTime($allExpensesDatum['createdAt']);
             $createdAt->setTimezone(new DateTimeZone('Asia/Kolkata'));
             $formattedAllExpensesData[] = [
@@ -88,7 +97,9 @@ class PlanController extends Controller
                 'amount' => $allExpensesDatum['amount'],
                 'isShared' => $allExpensesDatum['isShared'],
                 'shareDetails' => $formattedSharedExpenseDetails,
-                'createdAt' => $createdAt->format('D, Y-m-d H:i:s')
+                'createdAt' => $createdAt->format('D, Y-m-d H:i:s'),
+                'isEqualDistribution' => $allExpensesDatum['isEqualDistribution'],
+                'distributionDetails' => $formattedSharedExpenseDistributionDetails
             ];
         }
 

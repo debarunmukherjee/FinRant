@@ -12,7 +12,8 @@ class SharedExpenseDetail extends Model
     protected $fillable = [
         'batch_id',
         'user_id',
-        'amount'
+        'amount',
+        'is_equal_distribution'
     ];
 
     /**
@@ -21,7 +22,7 @@ class SharedExpenseDetail extends Model
      * @param array $userAmountData
      * @return bool
      */
-    public static function saveSharedExpenseDetail(string $batchId, array $userAmountData): bool
+    public static function saveSharedExpenseDetail(string $batchId, array $userAmountData, bool $isEqualDistribution): bool
     {
         $result = true;
         foreach ($userAmountData as $userId => $amount) {
@@ -29,6 +30,7 @@ class SharedExpenseDetail extends Model
             $shareDetail->batch_id = $batchId;
             $shareDetail->user_id = $userId;
             $shareDetail->amount = $amount;
+            $shareDetail->is_equal_distribution = $isEqualDistribution ? 1 : 0;
             $result = $result && $shareDetail->save();
         }
         return $result;
@@ -44,6 +46,6 @@ class SharedExpenseDetail extends Model
      */
     public static function getSharedExpenseDetails($batchId): array
     {
-        return self::where('batch_id', $batchId)->get(['user_id as userIdWhoPaid', 'amount'])->toArray();
+        return self::where('batch_id', $batchId)->get(['user_id as userIdWhoPaid', 'amount', 'is_equal_distribution'])->toArray();
     }
 }

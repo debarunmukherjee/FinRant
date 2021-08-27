@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ExpendCategory;
 use App\Models\Expense;
+use App\Models\ExpenseDistribution;
 use App\Models\PendingPlanDebt;
 use App\Models\Plan;
 use App\Models\PlanDebt;
@@ -26,6 +27,7 @@ class ExpenseController extends Controller
         $isSharedExpense = $request->post('isSharedExpense');
         $planId = $request->post('planId');
         $sharedExpenseMembersPaidEqually =  $request->post('sharedExpenseMembersPaidEqually');
+        $sharedExpenseMembersDistributedEqually =  $request->post('sharedExpenseMembersDistributedEqually');
         $expenseAmount = (int)$request->post('amount');
         $request->validate([
             'isSharedExpense' => ['required', 'boolean'],
@@ -42,6 +44,7 @@ class ExpenseController extends Controller
                 },
             ],
             'sharedExpenseMembersPaidEqually' => ['required', 'boolean'],
+            'sharedExpenseMembersDistributedEqually' => ['required', 'boolean'],
             'sharedExpenseMembersWhoPaid' => [
                 function ($attribute, $value, $fail) use($isSharedExpense, $planId, $sharedExpenseMembersPaidEqually, $expenseAmount) {
                     if ($isSharedExpense && !$sharedExpenseMembersPaidEqually) {
@@ -60,6 +63,25 @@ class ExpenseController extends Controller
                         }
                     }
                 }
+            ],
+            'sharedExpenseMembersDistribution' => [
+                function ($attribute, $value, $fail) use($isSharedExpense, $planId, $sharedExpenseMembersDistributedEqually, $expenseAmount) {
+                    if ($isSharedExpense && !$sharedExpenseMembersDistributedEqually) {
+                        $isValidData = true;
+                        $totalAmount = 0;
+                        foreach ($value as $member) {
+                            $userId = User::getUserIdFromEmail($member['email']);
+                            if ((int)$member['amount'] <= 0 || !Plan::userHasPlanExpenseAccess($userId, $planId)) {
+                                $isValidData = false;
+                                break;
+                            }
+                            $totalAmount += (int)$member['amount'];
+                        }
+                        if (!$isValidData || $totalAmount !== $expenseAmount) {
+                            $fail('Sum of distribution does not match total expense');
+                        }
+                    }
+                }
             ]
         ]);
     }
@@ -73,14 +95,23 @@ class ExpenseController extends Controller
         $categoryId = ExpendCategory::getCategoryIdFromName($request->post('category'), $userId);
         $sharedExpenseMembersPaidEqually =  $request->post('sharedExpenseMembersPaidEqually');
         $sharedExpenseMembersWhoPaid =  $request->post('sharedExpenseMembersWhoPaid');
+        $sharedExpenseMembersDistributedEqually =  $request->post('sharedExpenseMembersDistributedEqually');
+        $sharedExpenseMembersDistribution =  $request->post('sharedExpenseMembersDistribution');
         $expenseAmount = $request->post('amount');
         $totalMemberCount = PlanMember::getMemberCount($planId);
         $planMemberUserIds = PlanMember::getAllPlanMemberUserIds($planId);
         $sharedExpenseMembersUserData = [];
+        $sharedExpenseMembersDistributionData = [];
 
         if (!$sharedExpenseMembersPaidEqually) {
             foreach ($sharedExpenseMembersWhoPaid as $member) {
                 $sharedExpenseMembersUserData[User::getUserIdFromEmail($member['email'])] = (float)$member['amount'];
+            }
+        }
+
+        if (!$sharedExpenseMembersDistributedEqually) {
+            foreach ($sharedExpenseMembersDistribution as $member) {
+                $sharedExpenseMembersDistributionData[User::getUserIdFromEmail($member['email'])] = (float)$member['amount'];
             }
         }
 
@@ -96,7 +127,9 @@ class ExpenseController extends Controller
                 $totalMemberCount,
                 $sharedExpenseMembersUserData,
                 $planMemberUserIds,
-                $sharedExpenseMembersPaidEqually
+                $sharedExpenseMembersPaidEqually,
+                $sharedExpenseMembersDistributedEqually,
+                $sharedExpenseMembersDistributionData
             ) {
                 if (!$isSharedExpense) {
                     if (Expense::createUnsharedExpenseForUser($userId, $planId, $categoryId, round($expenseAmount, 2))) {
@@ -106,9 +139,9 @@ class ExpenseController extends Controller
                 }
 
                 $eachAmount = round($expenseAmount / $totalMemberCount, 2);
+                $sharedExpenseBatchId = Str::random(64);
 
                 // Making a record of the shared expense details
-                $sharedExpenseBatchId = Str::random(64);
                 $userDataToBeSavedInSharedExpenseDetailsTable = [];
                 if ($sharedExpenseMembersPaidEqually) {
                     foreach ($planMemberUserIds as $id) {
@@ -117,15 +150,39 @@ class ExpenseController extends Controller
                 } else {
                     $userDataToBeSavedInSharedExpenseDetailsTable = $sharedExpenseMembersUserData;
                 }
-                $result = SharedExpenseDetail::saveSharedExpenseDetail($sharedExpenseBatchId, $userDataToBeSavedInSharedExpenseDetailsTable);
+                $result = SharedExpenseDetail::saveSharedExpenseDetail($sharedExpenseBatchId, $userDataToBeSavedInSharedExpenseDetailsTable, $sharedExpenseMembersDistributedEqually);
+
+                // Making a record of the distribution
+                $userDataToBeSavedInExpenseDistributionTable = [];
+                if ($sharedExpenseMembersDistributedEqually) {
+                    foreach ($planMemberUserIds as $id) {
+                        $userDataToBeSavedInExpenseDistributionTable[$id] = $eachAmount;
+                    }
+                } else {
+                    $userDataToBeSavedInExpenseDistributionTable = $sharedExpenseMembersDistributionData;
+                }
+                $result = $result && ExpenseDistribution::saveExpenseDistributionDetail($sharedExpenseBatchId, $userDataToBeSavedInExpenseDistributionTable);
 
                 // Make records of the debt of every member in the plan debt maintaining table, in case the amount was not shared equally.
-                if (!$sharedExpenseMembersPaidEqually) {
+                if (!($sharedExpenseMembersPaidEqually && $sharedExpenseMembersDistributedEqually)) {
                     foreach ($planMemberUserIds as $planMemberUserId) {
                         $currentDebt = PlanDebt::getCurrentDebtForUser($planId, $planMemberUserId);
-                        $amountPaid = empty($sharedExpenseMembersUserData[$planMemberUserId]) ? 0 : $sharedExpenseMembersUserData[$planMemberUserId];
+
+                        if ($sharedExpenseMembersPaidEqually) {
+                            $amountPaid = $eachAmount;
+                        } else {
+                            $amountPaid = empty($sharedExpenseMembersUserData[$planMemberUserId]) ? 0 : $sharedExpenseMembersUserData[$planMemberUserId];
+                        }
+
+                        if ($sharedExpenseMembersDistributedEqually) {
+                            $amountOwed = $eachAmount;
+                        } else {
+                            $amountOwed = empty($sharedExpenseMembersDistributionData[$planMemberUserId]) ? 0 : $sharedExpenseMembersDistributionData[$planMemberUserId];
+                        }
+
                         $amountPaid = round($amountPaid, 2);
-                        $result = $result && PlanDebt::saveDebtAmountForUser($planId, $planMemberUserId, $currentDebt + $eachAmount - $amountPaid);
+                        $amountOwed = round($amountOwed, 2);
+                        $result = $result && PlanDebt::saveDebtAmountForUser($planId, $planMemberUserId, $currentDebt + $amountOwed - $amountPaid);
                     }
 
                     // Recalculate the debts as the expense is shared equally but not every member paid equally.
@@ -135,7 +192,7 @@ class ExpenseController extends Controller
                 }
 
                 // Lastly, make entries in the expense table for every member.
-                $result = $result && Expense::createSharedExpenseForAllPlanMembers($planId, $categoryId, $eachAmount, $sharedExpenseBatchId);
+                $result = $result && Expense::createSharedExpenseForPlanMembers($planId, $categoryId, $userDataToBeSavedInExpenseDistributionTable, $sharedExpenseBatchId);
                 // Log shared expense activity
                 $result = $result && Expense::logSharedExpenseActivityMessageForPlan(Auth::id(), $planId, $categoryId, $expenseAmount);
                 if (!$result) {

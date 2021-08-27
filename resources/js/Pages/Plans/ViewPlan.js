@@ -32,7 +32,8 @@ export default function ViewPlan(props) {
         dispatch({
             ...state,
             selectedExpenseCategory: categoryList.length > 0 ? categoryList[0] : null,
-            sharedExpenseMemberToBeAdded: planMemberList[0]
+            sharedExpenseMemberToBeAdded: planMemberList[0],
+            sharedExpenseDistributionMemberToBeAdded: planMemberList[0]
         })
     },[]);
 

@@ -8,6 +8,7 @@ import NumberInput from "@/Components/NumberInput";
 import {PlanContext} from "@/Pages/Plans/ViewPlan";
 import {Divider} from "@material-ui/core";
 import MemberExpenseTransaction from "@/Pages/Plans/MemberExpenseTransaction";
+import {useSnackbar} from "notistack";
 
 export default function RecordPlanExpense({ planId }) {
     const { categoryList, errors, planMemberList } = usePage().props;
@@ -21,7 +22,12 @@ export default function RecordPlanExpense({ planId }) {
         sharedExpenseMemberToBeAdded,
         sharedExpenseMemberAmount,
         sharedExpenseMembersPaidEqually,
-        sharedMemberExpenseError
+        sharedMemberExpenseError,
+        sharedExpenseMembersDistributedEqually,
+        sharedExpenseMembersDistribution,
+        sharedExpenseDistributionMemberToBeAdded,
+        sharedExpenseMemberDistributionAmount,
+        sharedMemberDistributionError
     } = state;
 
     const { data, setData, post, processing, clearErrors } = useForm({
@@ -30,8 +36,12 @@ export default function RecordPlanExpense({ planId }) {
         amount: 0,
         planId: 0,
         sharedExpenseMembersPaidEqually: true,
-        sharedExpenseMembersWhoPaid: []
+        sharedExpenseMembersWhoPaid: [],
+        sharedExpenseMembersDistributedEqually: true,
+        sharedExpenseMembersDistribution: []
     });
+
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         setData({
@@ -41,7 +51,9 @@ export default function RecordPlanExpense({ planId }) {
             amount: expenseAmount,
             planId: planId,
             sharedExpenseMembersPaidEqually: sharedExpenseMembersPaidEqually,
-            sharedExpenseMembersWhoPaid: sharedExpenseMembersWhoPaid
+            sharedExpenseMembersWhoPaid: sharedExpenseMembersWhoPaid,
+            sharedExpenseMembersDistributedEqually: sharedExpenseMembersDistributedEqually,
+            sharedExpenseMembersDistribution: sharedExpenseMembersDistribution
         });
     }, [])
 
@@ -60,6 +72,13 @@ export default function RecordPlanExpense({ planId }) {
         });
     }
 
+    const setSharedExpenseDistributionMemberToBeAdded = (val) => {
+        dispatch({
+            ...state,
+            sharedExpenseDistributionMemberToBeAdded: val
+        });
+    }
+
     const setExpenseAmount = (val) => {
         setData('amount', val);
         dispatch({
@@ -75,6 +94,13 @@ export default function RecordPlanExpense({ planId }) {
         });
     }
 
+    const setSharedExpenseMemberDistributionAmount = (val) => {
+        dispatch({
+            ...state,
+            sharedExpenseMemberDistributionAmount: val
+        });
+    }
+
     const setSharedExpenseMembersPaidEqually = (val) => {
         setData('sharedExpenseMembersPaidEqually', val);
         dispatch({
@@ -83,10 +109,25 @@ export default function RecordPlanExpense({ planId }) {
         });
     }
 
+    const setSharedExpenseMembersDistributedEqually = (val) => {
+        setData('sharedExpenseMembersDistributedEqually', val);
+        dispatch({
+            ...state,
+            sharedExpenseMembersDistributedEqually: val
+        });
+    }
+
     const setSharedMemberExpenseError = (val) => {
         dispatch({
             ...state,
             sharedMemberExpenseError: val
+        });
+    }
+
+    const setSharedMemberDistributionError = (val) => {
+        dispatch({
+            ...state,
+            sharedMemberDistributionError: val
         });
     }
 
@@ -100,30 +141,47 @@ export default function RecordPlanExpense({ planId }) {
 
     const handleRecordExpense = (e) => {
         e.preventDefault();
-        post('/expense/add', {
-            onSuccess: () => {
-                clearErrors();
-                setData({
-                    isSharedExpense: false,
-                    category: categoryList.length > 0 ? categoryList[0].name : '',
-                    amount: 0,
-                    planId: planId,
-                    sharedExpenseMembersPaidEqually: true,
-                    sharedExpenseMembersWhoPaid: []
-                });
-                dispatch({
-                    ...state,
-                    isSharedExpense: false,
-                    selectedExpenseCategory: categoryList.length > 0 ? categoryList[0] : null,
-                    expenseAmount: 0,
-                    sharedExpenseMembersWhoPaid: [],
-                    sharedExpenseMemberToBeAdded: planMemberList[0],
-                    sharedExpenseMemberAmount: 0,
-                    sharedExpenseMembersPaidEqually: true,
-                    sharedMemberExpenseError: '',
-                });
-            }
+        let totalAmount = 0;
+        sharedExpenseMembersDistribution.forEach((member) => {
+            totalAmount += member.amount
         });
+        if (!sharedExpenseMembersDistributedEqually && totalAmount !== Number(expenseAmount)) {
+            enqueueSnackbar('Sum of distributed amounts does not match the total expense', {
+                variant: "error"
+            });
+        } else {
+            post('/expense/add', {
+                onSuccess: () => {
+                    clearErrors();
+                    setData({
+                        isSharedExpense: false,
+                        category: categoryList.length > 0 ? categoryList[0].name : '',
+                        amount: 0,
+                        planId: planId,
+                        sharedExpenseMembersPaidEqually: true,
+                        sharedExpenseMembersWhoPaid: [],
+                        sharedExpenseMembersDistributedEqually: true,
+                        sharedExpenseMembersDistribution: []
+                    });
+                    dispatch({
+                        ...state,
+                        isSharedExpense: false,
+                        selectedExpenseCategory: categoryList.length > 0 ? categoryList[0] : null,
+                        expenseAmount: 0,
+                        sharedExpenseMembersWhoPaid: [],
+                        sharedExpenseMemberToBeAdded: planMemberList[0],
+                        sharedExpenseMemberAmount: 0,
+                        sharedExpenseMembersPaidEqually: true,
+                        sharedMemberExpenseError: '',
+                        sharedExpenseMembersDistributedEqually: true,
+                        sharedExpenseMembersDistribution : [],
+                        sharedExpenseDistributionMemberToBeAdded : planMemberList[0],
+                        sharedExpenseMemberDistributionAmount: 0,
+                        sharedMemberDistributionError: '',
+                    });
+                }
+            });
+        }
     }
 
     const addSharedPaymentMember = () => {
@@ -161,6 +219,34 @@ export default function RecordPlanExpense({ planId }) {
         }
     }
 
+    const addSharedPaymentDistributionMember = () => {
+        if (sharedExpenseMembersDistribution.filter((member) => member.email === sharedExpenseDistributionMemberToBeAdded.email).length > 0) {
+            setSharedMemberDistributionError('Member has already been added.');
+        } else if(sharedExpenseMemberDistributionAmount <= 0) {
+            setSharedMemberDistributionError('The amount has to be greater than 0.');
+        } else {
+            const newListOfSharedExpenseMembersDistribution = [
+                ...sharedExpenseMembersDistribution,
+                {
+                    email: sharedExpenseDistributionMemberToBeAdded.email,
+                    amount: sharedExpenseMemberDistributionAmount,
+                    fullName: sharedExpenseDistributionMemberToBeAdded.fullName,
+                }
+            ];
+            setData({
+                ...data,
+                sharedExpenseMembersDistribution: newListOfSharedExpenseMembersDistribution
+            });
+            dispatch({
+                ...state,
+                sharedExpenseMembersDistribution: newListOfSharedExpenseMembersDistribution,
+                sharedExpenseDistributionMemberToBeAdded: planMemberList[0],
+                sharedExpenseMemberDistributionAmount: 0,
+                sharedMemberDistributionError: ''
+            });
+        }
+    }
+
     const removeSharedExpenseMember = (email) => {
         const newListOfSharedExpenseMembersWhoPaid = sharedExpenseMembersWhoPaid.filter((member) => member.email !== email);
         let totalAmount = 0;
@@ -178,6 +264,21 @@ export default function RecordPlanExpense({ planId }) {
             sharedMemberExpenseError: '',
             sharedExpenseMembersWhoPaid: newListOfSharedExpenseMembersWhoPaid,
             sharedExpenseMemberToBeAdded: planMemberList[0],
+        })
+    }
+
+    const removeSharedExpenseDistributionMember = (email) => {
+        const newListOfSharedExpenseMembersDistribution = sharedExpenseMembersDistribution.filter((member) => member.email !== email);
+
+        setData({
+            ...data,
+            sharedExpenseMembersDistribution: newListOfSharedExpenseMembersDistribution,
+        });
+        dispatch({
+            ...state,
+            sharedMemberDistributionError: '',
+            sharedExpenseMembersDistribution: newListOfSharedExpenseMembersDistribution,
+            sharedExpenseDistributionMemberToBeAdded: planMemberList[0],
         })
     }
 
@@ -291,7 +392,7 @@ export default function RecordPlanExpense({ planId }) {
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-blue-400">
                                                             <span onClick={() => {removeSharedExpenseMember(member.email)}}>
-                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 cursor-pointer" viewBox="0 0 20 20" fill="currentColor">
                                                                     <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                                                                 </svg>
                                                             </span>
@@ -306,7 +407,102 @@ export default function RecordPlanExpense({ planId }) {
                             </div>
                         ) : ''}
                         {sharedExpenseMembersWhoPaid.length === 0 && !sharedExpenseMembersPaidEqually ? (
-                            <Alert className="mt-2 max-w-full sm:max-w-3/4" severity="error">You have to add at least 1 member belonging to this plan!</Alert>
+                            <Alert className="mt-2 mb-2 max-w-full sm:max-w-3/4" severity="error">You have to add at least 1 member belonging to this plan!</Alert>
+                        ) : ''}
+                        <div className="mt-6">
+                            <label className="inline-flex items-center mt-3 mb-3">
+                                <span className="mr-2 text-gray-700">Expense to be shared equally among all?</span>
+                                <input type="checkbox" className="form-checkbox h-5 w-5 text-blue-600 rounded" checked={sharedExpenseMembersDistributedEqually} onChange={() => {setSharedExpenseMembersDistributedEqually(!sharedExpenseMembersDistributedEqually)}}/>
+                            </label>
+                        </div>
+                        {!sharedExpenseMembersDistributedEqually ? (
+                            <div className="mt-6">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Add member(s) among whom expense is to be distributed
+                                </label>
+                                <div className="flex flex-col sm:flex-row">
+                                    <AutocompleteSelect
+                                        itemsList={planMemberList}
+                                        itemLabelKey="fullName"
+                                        selectedValue={sharedExpenseDistributionMemberToBeAdded}
+                                        setSelectedValue={setSharedExpenseDistributionMemberToBeAdded}
+                                        placeholder="Search Member"
+                                        customClasses="m-2 ml-2 sm:ml-0 w-full sm:w-1/2"
+                                    />
+                                    <NumberInput
+                                        value={sharedExpenseMemberDistributionAmount}
+                                        setValue={setSharedExpenseMemberDistributionAmount}
+                                        placeholder="Enter amount"
+                                        customClasses="m-2"
+                                    />
+                                    <Button type="button" className="hover:bg-blue-500 bg-blue-400 inline justify-center w-full sm:w-auto m-2" onClick={addSharedPaymentDistributionMember} processing={sharedExpenseMembersDistributedEqually}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </Button>
+                                </div>
+                                {sharedMemberDistributionError ? (<p className="text-red-500 text-xs mb-1">{sharedMemberDistributionError}</p>) : ''}
+                            </div>
+                        ) : ''}
+                        {sharedExpenseMembersDistribution.length > 0 && !sharedExpenseMembersDistributedEqually ? (
+                            <div className="flex flex-col">
+                                <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                    <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                                        <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                            <table className="min-w-full divide-y divide-gray-200">
+                                                <thead className="bg-gray-50">
+                                                <tr>
+                                                    <th
+                                                        scope="col"
+                                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                    >
+                                                        Name
+                                                    </th>
+                                                    <th
+                                                        scope="col"
+                                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                    >
+                                                        Amount
+                                                    </th>
+                                                    <th
+                                                        scope="col"
+                                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                    >
+                                                        Remove
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200">
+                                                {sharedExpenseMembersDistribution.map((member, index) => (
+                                                    <tr key={index}>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="flex items-center">
+                                                                <div className="ml-4">
+                                                                    <div className="text-sm font-medium text-gray-900">{member.fullName}</div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="text-sm text-gray-900">{member.amount}</div>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-blue-400">
+                                                            <span onClick={() => {removeSharedExpenseDistributionMember(member.email)}}>
+                                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 cursor-pointer" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                                </svg>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : ''}
+                        {sharedExpenseMembersDistribution.length === 0 && !sharedExpenseMembersDistributedEqually ? (
+                            <Alert className="mt-2 mb-2 max-w-full sm:max-w-3/4" severity="error">You have to add at least 1 member belonging to this plan!</Alert>
                         ) : ''}
                     </>
                 ) : ''}
@@ -327,7 +523,7 @@ export default function RecordPlanExpense({ planId }) {
                                 setIsSharedExpense(value);
                             }
                         }}
-                        labelText="Share equally among all members? "
+                        labelText="Share among members? "
                         shouldDisplayYesNo={true}
                     />
                     <p className="text-xs mb-1">Requires at least 2 members in your plan.</p>
@@ -342,6 +538,7 @@ export default function RecordPlanExpense({ planId }) {
                             expenseAmount <= 0 ||
                             (isSharedExpense && planMemberList.length < 2) ||
                             (isSharedExpense && !sharedExpenseMembersPaidEqually && sharedExpenseMembersWhoPaid.length < 1) ||
+                            (isSharedExpense && !sharedExpenseMembersDistributedEqually && sharedExpenseMembersDistribution.length < 1) ||
                             !selectedExpenseCategory ||
                             processing
                         }
